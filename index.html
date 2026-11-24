@@ -249,9 +249,11 @@ const ROTULO = {frentes:'Frentes', modalidade:'Modalidade', deslocamento:'Pode i
 
 // ---------- estado ----------
 const S = {mob:null, cid:[], nec:[], inst:[], avisos:[], ind:{}, user:null, lib:[], com:null, grupo:null, filtroGrav:'', busca:'', filtroCad:'voluntario', filtroStatus:'', edit:null, enviando:false};
-const team = () => S.lib.some(l => l.papel === 'equipe' || l.papel === 'gestao');
+const coord = () => S.lib.some(l => l.papel === 'coordenadora');
+const team = () => S.lib.some(l => l.papel === 'equipe' || l.papel === 'coordenadora' || l.papel === 'gestao');
 const gestao = () => S.lib.some(l => l.papel === 'gestao');
-const equipeDe = c => S.lib.some(l => l.papel === 'gestao' || (l.papel === 'equipe' && l.comunidade === c));
+const podeApagar = () => gestao();
+const equipeDe = c => S.lib.some(l => l.papel === 'gestao' || l.papel === 'coordenadora' || (l.papel === 'equipe' && l.comunidade === c));
 let mapas = [], chatTimer = null;
 
 async function carregar(){
@@ -666,7 +668,7 @@ async function comunidade(){
   if (!S.lib.length) return `<h2 class="titulo">Comunidade</h2><div class="risco"></div><div class="card"><h2>Entrada ainda não liberada</h2>
     <p>O e-mail <b>${esc(S.user.email)}</b> ainda não foi liberado. Depois do cadastro de voluntário e da assinatura do termo, a equipe libera o seu acesso.</p>
     <a class="btn" href="#ajudar/voluntario">Fazer cadastro de voluntário</a>${CFG.termoUrl ? `<a class="btn alt" href="${esc(CFG.termoUrl)}" target="_blank" rel="noopener">Assinar o termo</a>` : ''}<button class="btn alt" onclick="sair()">Sair</button></div>`;
-  const cs = gestao() ? ['map','pet'] : [...new Set(S.lib.map(l => l.comunidade))];
+  const cs = (gestao() || coord()) ? ['map','pet'] : [...new Set(S.lib.map(l => l.comunidade))];
   if (!cs.includes(S.com)) S.com = cs[0];
   const nome = {map:'MAP Solidário', pet:'Pet Solidário'};
   const [gr, av] = await Promise.all([
@@ -781,7 +783,7 @@ function cartaoCadastro(c){
   <label class="cp">Notas internas</label><textarea id="nt_${c.id}" rows="3">${esc(c.notas_internas)}</textarea>
   <button class="btn peq" onclick="salvarCadastro('${c.id}')">Salvar</button>
   ${c.tipo === 'voluntario' && c.email ? `<button class="btn peq verde" onclick="liberarVol('${c.id}')">${ico('user-check')} Liberar na Comunidade</button>` : ''}
-  ${gestao() ? `<button class="btn peq perigo" onclick="apagarReg('cadastros','${c.id}')">Apagar (pedido do titular)</button>` : ''}
+  ${podeApagar() ? `<button class="btn peq perigo" onclick="apagarReg('cadastros','${c.id}')">Apagar (pedido do titular)</button>` : ''}
   </details></div>`;
 }
 async function salvarCadastro(id){
@@ -807,7 +809,7 @@ function exportarCSV(){
   const cab = ['Data','Nome','E-mail','Telefone','Cidade/país','Etapa','Valor','Responsável','Notas'].concat(chaves.map(k => ROTULO[k] || k));
   const cel = v => '"' + String(Array.isArray(v) ? v.join(', ') : (v ?? '')).replace(/"/g, '""') + '"';
   const linhas = L.map(c => [dataHora(c.criado), c.nome, c.email, c.telefone, c.cidade_pais, (FLUXO[c.tipo].find(s => s[0] === c.status) || [0, c.status])[1], c.valor ?? '', c.responsavel, c.notas_internas].concat(chaves.map(k => (c.dados || {})[k])).map(cel).join(';'));
-  const blob = new Blob(['﻿' + [cab.map(cel).join(';')].concat(linhas).join('\n')], {type:'text/csv;charset=utf-8'});
+  const blob = new Blob(['\uFEFF' + [cab.map(cel).join(';')].concat(linhas).join('\n')], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `map-solidario-${S.filtroCad}-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
 }
 // ---------- informes ----------
@@ -864,6 +866,7 @@ async function salvarReg(e, tabela){
 }
 function editar(tabela, id, lista){ S.edit = {t:tabela, v:(lista || S['_' + tabela] || []).find(x => x.id === id)}; render().then(() => $('#formReg')?.scrollIntoView({behavior:'smooth'})); }
 async function apagarReg(tabela, id){
+  if (!podeApagar()) return toast('Apenas a gestão geral pode apagar registros.');
   if (!confirm('Apagar definitivamente? Não dá para desfazer.')) return;
   const {error} = await sb.from(tabela).delete().eq('id', id);
   if (error) return toast('Não apagou: ' + error.message);
@@ -875,7 +878,7 @@ async function eqCidades(){
   <div class="card"><h2>Achar as coordenadas</h2><p class="mut">Digite o nome e toque em Buscar, ou toque no mapa no lugar certo. As coordenadas vão direto para o formulário acima.</p>
   <div style="display:flex;gap:8px"><input id="buscaGeo" placeholder="Nome da cidade"><button class="btn peq" style="margin:0" onclick="buscarCoord()">${ico('search')} Buscar</button></div>
   <div class="mapa" id="mapaEquipe" style="height:320px;margin-top:8px"></div></div>
-  <div class="card"><h2>Cidades no mapa (${S.cid.length})</h2>${S.cid.map(c => `<div class="item"><span class="chip" style="background:${GRAV[c.gravidade][1]}">${GRAV[c.gravidade][0]}</span><b>${esc(c.nome)}</b>${c.destaque ? ' <span class="chip" style="background:var(--mag)">Destaque</span>' : ''}<br><small>Atualizado ${dataHora(c.atualizado)}${c.atualizado_por ? ' por ' + esc(c.atualizado_por) : ''}</small><br><button class="btn peq alt" onclick="editar('cidades','${c.id}')">${ico('pencil')} Editar</button><button class="btn peq perigo" onclick="apagarReg('cidades','${c.id}')">Apagar</button></div>`).join('') || '<p class="vazio">Nenhuma cidade ainda.</p>'}</div>`;
+  <div class="card"><h2>Cidades no mapa (${S.cid.length})</h2>${S.cid.map(c => `<div class="item"><span class="chip" style="background:${GRAV[c.gravidade][1]}">${GRAV[c.gravidade][0]}</span><b>${esc(c.nome)}</b>${c.destaque ? ' <span class="chip" style="background:var(--mag)">Destaque</span>' : ''}<br><small>Atualizado ${dataHora(c.atualizado)}${c.atualizado_por ? ' por ' + esc(c.atualizado_por) : ''}</small><br><button class="btn peq alt" onclick="editar('cidades','${c.id}')">${ico('pencil')} Editar</button>${podeApagar() ? `<button class="btn peq perigo" onclick="apagarReg('cidades','${c.id}')">Apagar</button>` : ''}</div>`).join('') || '<p class="vazio">Nenhuma cidade ainda.</p>'}</div>`;
 }
 function preencherCoord(lat, lng){
   const f = $('#formReg form'); if (!f) return;
@@ -896,18 +899,18 @@ async function buscarCoord(){
 async function eqNecessidades(){
   const {data} = await sb.from('necessidades').select('*').eq('mobilizacao_id', S.mob?.id).order('atendida').order('atualizado', {ascending:false});
   S._necessidades = data || [];
-  return `${formReg('necessidades', 'Nova necessidade')}<div class="card"><h2>Necessidades</h2>${S._necessidades.map(x => { const c = S.cid.find(y => y.id === x.cidade_id); return `<div class="item" style="${x.atendida ? 'opacity:.55' : ''}">${ico(CAT[x.categoria][1])} <b>${esc(x.item)}</b> <span class="chip cl">${esc(x.prioridade)}</span>${x.atendida ? ' <span class="chip" style="background:var(--teal)">Atendida</span>' : ''}<br><small>${c ? esc(c.nome) : 'Geral'}${x.quantidade ? ' · ' + esc(x.quantidade) : ''}</small><br><button class="btn peq alt" onclick="editar('necessidades','${x.id}')">${ico('pencil')} Editar</button><button class="btn peq ${x.atendida ? 'alt' : 'verde'}" onclick="marcarAtendida('${x.id}',${!x.atendida})">${x.atendida ? 'Reabrir' : 'Marcar atendida'}</button><button class="btn peq perigo" onclick="apagarReg('necessidades','${x.id}')">Apagar</button></div>`; }).join('') || '<p class="vazio">Nenhuma necessidade ainda.</p>'}</div>`;
+  return `${formReg('necessidades', 'Nova necessidade')}<div class="card"><h2>Necessidades</h2>${S._necessidades.map(x => { const c = S.cid.find(y => y.id === x.cidade_id); return `<div class="item" style="${x.atendida ? 'opacity:.55' : ''}">${ico(CAT[x.categoria][1])} <b>${esc(x.item)}</b> <span class="chip cl">${esc(x.prioridade)}</span>${x.atendida ? ' <span class="chip" style="background:var(--teal)">Atendida</span>' : ''}<br><small>${c ? esc(c.nome) : 'Geral'}${x.quantidade ? ' · ' + esc(x.quantidade) : ''}</small><br><button class="btn peq alt" onclick="editar('necessidades','${x.id}')">${ico('pencil')} Editar</button><button class="btn peq ${x.atendida ? 'alt' : 'verde'}" onclick="marcarAtendida('${x.id}',${!x.atendida})">${x.atendida ? 'Reabrir' : 'Marcar atendida'}</button>${podeApagar() ? `<button class="btn peq perigo" onclick="apagarReg('necessidades','${x.id}')">Apagar</button>` : ''}</div>`; }).join('') || '<p class="vazio">Nenhuma necessidade ainda.</p>'}</div>`;
 }
 async function marcarAtendida(id, v){ await sb.from('necessidades').update({atendida:v, atualizado:new Date().toISOString()}).eq('id', id); await carregar(); render(); }
 async function eqInstituicoes(){
   S._instituicoes = S.inst;
   return `${formReg('instituicoes', 'Nova instituição ou link')}<div class="aviso">Confira o link e a conta oficial antes de marcar como verificada. Só as verificadas aparecem para o público.</div>
-  <div class="card"><h2>Instituições (${S.inst.length})</h2>${S.inst.map(i => `<div class="item">${i.verificada ? '<span class="chip" style="background:var(--teal)">Verificada</span>' : '<span class="chip" style="background:var(--lar)">Não verificada</span>'}<b>${esc(i.nome)}</b> <span class="chip cl">${esc(TIPO_INST[i.tipo])}</span> <span class="chip cl">${i.frente === 'pet' ? 'Pet' : 'MAP'}</span><br><small>${esc(i.cidade || '')} ${urlSegura(i.link) ? `· <a href="${esc(i.link)}" target="_blank" rel="noopener">abrir link</a>` : ''}</small><br><button class="btn peq alt" onclick="editar('instituicoes','${i.id}')">${ico('pencil')} Editar</button><button class="btn peq perigo" onclick="apagarReg('instituicoes','${i.id}')">Apagar</button></div>`).join('') || '<p class="vazio">Nenhuma ainda.</p>'}</div>`;
+  <div class="card"><h2>Instituições (${S.inst.length})</h2>${S.inst.map(i => `<div class="item">${i.verificada ? '<span class="chip" style="background:var(--teal)">Verificada</span>' : '<span class="chip" style="background:var(--lar)">Não verificada</span>'}<b>${esc(i.nome)}</b> <span class="chip cl">${esc(TIPO_INST[i.tipo])}</span> <span class="chip cl">${i.frente === 'pet' ? 'Pet' : 'MAP'}</span><br><small>${esc(i.cidade || '')} ${urlSegura(i.link) ? `· <a href="${esc(i.link)}" target="_blank" rel="noopener">abrir link</a>` : ''}</small><br><button class="btn peq alt" onclick="editar('instituicoes','${i.id}')">${ico('pencil')} Editar</button>${podeApagar() ? `<button class="btn peq perigo" onclick="apagarReg('instituicoes','${i.id}')">Apagar</button>` : ''}</div>`).join('') || '<p class="vazio">Nenhuma ainda.</p>'}</div>`;
 }
 async function eqAvisos(){
   const {data} = await sb.from('avisos').select('*').order('criado', {ascending:false}).limit(100);
   S._avisos = data || [];
-  return `${formReg('avisos', 'Novo aviso')}<div class="card"><h2>Avisos publicados</h2>${S._avisos.map(a => `<div class="item"><span class="chip ${a.publico ? '' : 'cl'}" style="${a.publico ? 'background:var(--teal)' : ''}">${a.publico ? 'Público' : 'Interno' + (a.comunidade ? ' · ' + (a.comunidade === 'pet' ? 'Pet' : 'MAP') : '')}</span><b>${esc(a.titulo)}</b><br><small>${dataHora(a.criado)} · ${esc(a.autor || '')}</small><br><button class="btn peq alt" onclick="editar('avisos','${a.id}')">${ico('pencil')} Editar</button><button class="btn peq perigo" onclick="apagarReg('avisos','${a.id}')">Apagar</button></div>`).join('') || '<p class="vazio">Nenhum aviso.</p>'}</div>`;
+  return `${formReg('avisos', 'Novo aviso')}<div class="card"><h2>Avisos publicados</h2>${S._avisos.map(a => `<div class="item"><span class="chip ${a.publico ? '' : 'cl'}" style="${a.publico ? 'background:var(--teal)' : ''}">${a.publico ? 'Público' : 'Interno' + (a.comunidade ? ' · ' + (a.comunidade === 'pet' ? 'Pet' : 'MAP') : '')}</span><b>${esc(a.titulo)}</b><br><small>${dataHora(a.criado)} · ${esc(a.autor || '')}</small><br><button class="btn peq alt" onclick="editar('avisos','${a.id}')">${ico('pencil')} Editar</button>${podeApagar() ? `<button class="btn peq perigo" onclick="apagarReg('avisos','${a.id}')">Apagar</button>` : ''}</div>`).join('') || '<p class="vazio">Nenhum aviso.</p>'}</div>`;
 }
 async function eqGrupos(){
   const {data} = await sb.from('grupos').select('*').order('comunidade').order('nome');
@@ -926,17 +929,26 @@ async function arquivarGrupo(id, v){ const {error} = await sb.from('grupos').upd
 // ---------- acessos ----------
 async function eqAcessos(){
   const {data} = await sb.from('liberados').select('*').order('papel').order('email');
-  const L = data || [], P = {gestao:'Gestão', equipe:'Equipe', voluntario:'Voluntário'};
-  return `<div class="card"><h2>Liberar acesso</h2><p class="mut">Voluntário: só depois do termo assinado. ${gestao() ? 'Equipe e Gestão: só a Gestão libera.' : ''}</p><form onsubmit="return liberarAcesso(event)">
+  const L = data || [], P = {gestao:'Gestão', coordenadora:'Coordenadora', equipe:'Equipe', voluntario:'Voluntário'};
+  const podeDarPapel = p => gestao() || (coord() && (p === 'equipe' || p === 'voluntario'));
+  const podeRemover = l => l.email !== S.user.email.toLowerCase() && (gestao() || (coord() && (l.papel === 'equipe' || l.papel === 'voluntario')));
+  return `<div class="card"><h2>Liberar acesso</h2><p class="mut">Voluntário: só depois do termo assinado. ${gestao() ? 'A gestão geral pode liberar Coordenadora, Equipe e Voluntário.' : coord() ? 'A coordenação pode liberar Equipe e Voluntário nas duas frentes.' : ''}</p><form onsubmit="return liberarAcesso(event)">
   <label class="cp">E-mail <em>*</em></label><input name="email" type="email" required><label class="cp">Nome</label><input name="nome">
   <div class="dupla"><div><label class="cp">Comunidade</label><select name="comunidade"><option value="map">MAP Solidário</option><option value="pet">Pet Solidário</option></select></div>
-  <div><label class="cp">Papel</label><select name="papel"><option value="voluntario">Voluntário</option>${gestao() ? '<option value="equipe">Equipe</option><option value="gestao">Gestão</option>' : ''}</select></div></div>
+  <div><label class="cp">Papel</label><select name="papel">
+    ${podeDarPapel('voluntario') ? '<option value="voluntario">Voluntário</option>' : ''}
+    ${podeDarPapel('equipe') ? '<option value="equipe">Equipe</option>' : ''}
+    ${podeDarPapel('coordenadora') ? '<option value="coordenadora">Coordenadora</option>' : ''}
+    ${podeDarPapel('gestao') ? '<option value="gestao">Gestão</option>' : ''}
+  </select></div></div>
   <button class="btn">Liberar</button></form></div>
-  <div class="card"><h2>Quem tem acesso (${L.length})</h2>${L.map(l => `<div class="item"><span class="chip ${l.papel === 'voluntario' ? 'cl' : ''}" style="${l.papel === 'gestao' ? 'background:var(--mag)' : l.papel === 'equipe' ? 'background:var(--roxo)' : ''}">${P[l.papel]}</span><b>${esc(l.nome || l.email)}</b><br><small>${esc(l.email)} · ${l.comunidade === 'pet' ? 'Pet Solidário' : 'MAP Solidário'}</small>${(gestao() || l.papel === 'voluntario') && l.email !== S.user.email.toLowerCase() ? `<br><button class="btn peq perigo" onclick="removerAcesso('${esc(l.email)}','${l.comunidade}')">Remover acesso</button>` : ''}</div>`).join('')}</div>`;
+  <div class="card"><h2>Quem tem acesso (${L.length})</h2>${L.map(l => `<div class="item"><span class="chip ${l.papel === 'voluntario' ? 'cl' : ''}" style="${l.papel === 'gestao' ? 'background:var(--mag)' : l.papel === 'coordenadora' ? 'background:var(--teal2)' : l.papel === 'equipe' ? 'background:var(--roxo)' : ''}">${P[l.papel] || l.papel}</span><b>${esc(l.nome || l.email)}</b><br><small>${esc(l.email)} · ${l.comunidade === 'pet' ? 'Pet Solidário' : 'MAP Solidário'}</small>${podeRemover(l) ? `<br><button class="btn peq perigo" onclick="removerAcesso('${esc(l.email)}','${l.comunidade}')">Remover acesso</button>` : ''}</div>`).join('')}</div>`;
 }
 async function liberarAcesso(e){
   e.preventDefault(); const f = e.target;
-  const o = {email:f.email.value.trim().toLowerCase(), nome:f.nome.value.trim() || null, comunidade:f.comunidade.value, papel:f.papel.value};
+  const papel = f.papel.value;
+  if (!gestao() && !(coord() && (papel === 'equipe' || papel === 'voluntario'))) return toast('Você não tem permissão para atribuir esse papel.');
+  const o = {email:f.email.value.trim().toLowerCase(), nome:f.nome.value.trim() || null, comunidade:f.comunidade.value, papel};
   const {error} = await sb.from('liberados').insert(o);
   if (error) return toast(error.code === '23505' ? 'Este e-mail já está liberado nesta comunidade.' : 'Não liberou: ' + error.message), false;
   toast('Acesso liberado.'); render(); return false;

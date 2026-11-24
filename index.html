@@ -1,0 +1,1103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MAP Solidário · Mobilização, Apoio e Proteção</title>
+<meta name="description" content="MAP Solidário: mobilização humanitária para as cidades atingidas no Rio Grande do Sul. Seja voluntário, doe e acompanhe.">
+<meta property="og:title" content="MAP Solidário">
+<meta property="og:description" content="Mobilização · Apoio · Proteção. Veja como ajudar as cidades atingidas no RS.">
+<meta property="og:image" content="logo.png">
+<meta name="theme-color" content="#5B1F86">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{--roxo:#5B1F86;--roxo2:#7B2CA8;--mag:#C2185B;--lar:#F28C28;--ama:#F2B90F;--teal:#14A38B;--teal2:#0E8C77;--azul:#3AA0E8;--bg:#F6F3FA;--tx:#2A1640;--sub:#6E5A86;--linha:#E7DDF1;--crit:#E0245E;--grave:#F28C28;--mod:#F2C21B;--mon:#16A88F}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.45 Nunito,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+a{color:var(--roxo2)}
+svg.lucide{width:1em;height:1em;stroke-width:2;vertical-align:-.15em}
+/* ---------- topo ---------- */
+.topo{position:sticky;top:0;z-index:1000;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;overflow:hidden;box-shadow:0 1px 0 var(--linha)}
+.topo:after{content:"";position:absolute;right:-40px;top:-60px;width:170px;height:110px;background:linear-gradient(120deg,#2BC4B0 0 45%,var(--roxo) 46% 100%);transform:rotate(18deg);border-radius:0 0 0 40px;opacity:.95;pointer-events:none}
+.topo .ib{position:relative;z-index:1;background:none;border:0;color:var(--roxo);font-size:30px;padding:6px;cursor:pointer;line-height:0}
+.topo .marca{text-align:center;text-decoration:none;color:var(--tx);display:block}
+.topo .marca img{height:58px;display:block;margin:0 auto}
+.topo .marca span{font-size:.82rem;font-weight:600;letter-spacing:.2px}
+.topo .dir{display:flex;gap:6px;align-items:center;position:relative;z-index:1}
+.sino{position:relative}
+.sino i.ponto{position:absolute;top:6px;right:7px;width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid #fff}
+.topo .perfil{width:46px;height:46px;border-radius:50%;background:var(--roxo);color:#fff!important;display:grid;place-items:center;font-size:26px!important;box-shadow:0 0 0 3px #fff}
+main{max-width:860px;margin:0 auto;padding:10px 12px 20px}
+/* ---------- cartões ---------- */
+.card{background:#fff;border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 4px 18px #5b1f8614;border:1px solid #f0e9f7}
+.hero{position:relative;border-radius:22px;overflow:hidden;color:#fff;padding:20px 20px 22px;min-height:230px;background:linear-gradient(115deg,#4A1570 0%,#7B2CA8 55%,#C2185B 100%);background-size:cover;background-position:center;box-shadow:0 8px 24px #5b1f8630}
+.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#3d0f5ee6 0%,#5b1f86b0 45%,#5b1f8620 100%)}
+.hero>*{position:relative}
+.selo{display:inline-block;background:var(--teal);color:#fff;font-weight:800;border-radius:99px;padding:5px 16px;font-size:.95rem}
+.hero h1{font-size:clamp(2rem,8vw,3rem);line-height:1.05;margin:.3em 0 .2em;font-weight:900;letter-spacing:-.5px}
+.hero p{margin:0 0 14px;max-width:470px;font-weight:600;font-size:1.02rem}
+.btn-borda{display:inline-flex;gap:10px;align-items:center;border:2px solid #fff;color:#fff;background:#ffffff14;border-radius:99px;padding:9px 20px;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-radius:20px;margin:12px 0;padding:12px 4px;box-shadow:0 4px 18px #5b1f8614;border:1px solid #f0e9f7}
+.stats>div{display:grid;grid-template-columns:auto 1fr;gap:0 7px;align-items:center;padding:2px 8px;border-left:1px solid var(--linha)}
+.stats>div:first-child{border-left:0}
+.stats i,.stats svg{grid-row:span 2;font-size:30px;color:var(--roxo)}
+.stats b{font-size:1.25rem;font-weight:900;line-height:1.1}
+.stats small{font-size:.8rem;line-height:1.15;color:var(--tx)}
+.stats small em{display:block;font-style:normal;color:var(--sub);font-size:.72rem}
+@media (max-width:560px){.stats>div{gap:0 5px;padding:2px 5px}.stats svg{font-size:24px}.stats b{font-size:1.02rem}.stats small{font-size:.7rem}.stats small em{font-size:.62rem}}
+@media (max-width:380px){.stats{grid-template-columns:repeat(2,1fr);row-gap:10px}.stats>div:nth-child(3){border-left:0}}
+@media (max-width:360px){.stats>div{grid-template-columns:1fr;text-align:center}.stats svg{grid-row:auto;margin:auto}}
+/* ---------- mapa ---------- */
+.mapacard{display:grid;grid-template-columns:minmax(140px,36%) 1fr;gap:6px;padding:16px 10px 14px 16px;position:relative}
+.mapacard h2{margin:0 0 10px}
+.legenda svg{flex:0 0 auto}
+.legenda div{display:flex;align-items:center;gap:8px;margin:8px 0;font-weight:600;font-size:1.02rem;white-space:nowrap}
+.legenda hr{border:0;border-top:1px solid var(--linha);margin:10px 0}
+.total{text-align:center;font-weight:600}
+.mapa{height:300px;border-radius:16px;background:#fbf9fd;z-index:1}
+.mapa.grande{height:62vh;min-height:360px}
+.mapa-expandir{position:absolute;right:16px;top:14px;z-index:500;background:#fff;border:0;border-radius:10px;box-shadow:0 2px 8px #0002;width:38px;height:38px;display:grid;place-items:center;color:var(--tx);font-size:20px;cursor:pointer;text-decoration:none}
+@media (max-width:520px){.mapacard{grid-template-columns:minmax(138px,38%) 1fr;padding-left:12px}.mapacard h2{font-size:1.05rem}.legenda div{font-size:.84rem;gap:4px;margin:6px 0}.mapacard .btn-linha{padding:7px 8px;font-size:.8rem;gap:4px;white-space:nowrap;width:100%}.mapacard .mapa{height:270px}}
+@media (max-width:359px){.mapacard{grid-template-columns:1fr}}
+.leaflet-control-zoom{border:0!important;box-shadow:0 2px 8px #0002!important;border-radius:10px!important;overflow:hidden}
+.leaflet-control-zoom a{width:36px!important;height:36px!important;line-height:36px!important;font-size:20px!important;color:var(--tx)!important}
+.leaflet-container{font-family:Nunito,sans-serif;background:#f4f1f8}
+.leaflet-tile-pane{filter:grayscale(1) opacity(.55)}
+.pino{background:none;border:0}
+.pino svg{filter:drop-shadow(0 2px 2px #0003)}
+.balao{background:#9A1B4E!important;color:#fff!important;border:2px solid #fff!important;border-radius:12px!important;padding:6px 12px!important;font:800 15px/1.15 Nunito,sans-serif!important;text-align:center;box-shadow:0 4px 12px #0003!important}
+.balao small{font-weight:600}
+.balao:before{border-top-color:#9A1B4E!important}
+.leaflet-popup-content{font-family:Nunito,sans-serif;font-size:14px}
+/* ---------- botões ---------- */
+.btn{display:flex;width:100%;justify-content:center;align-items:center;gap:8px;background:var(--roxo);color:#fff;border:0;border-radius:14px;padding:12px 14px;font:inherit;font-weight:800;text-align:center;text-decoration:none;margin:8px 0;cursor:pointer}
+.btn.alt{background:#fff;color:var(--roxo);border:2px solid var(--roxo)}
+.btn.verde{background:var(--teal)}
+.btn.peq{display:inline-flex;width:auto;padding:7px 12px;font-size:.88rem;border-radius:10px;margin:4px 4px 0 0}
+.btn.perigo{background:#fff;color:var(--crit);border:2px solid #f3c2d2}
+.btn-linha{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--roxo);color:var(--roxo);background:#fff;border-radius:99px;padding:8px 18px;font:inherit;font-weight:800;text-decoration:none;cursor:pointer;margin-top:10px;justify-content:center}
+h2.titulo{font-size:1.55rem;font-weight:900;color:var(--roxo);margin:22px 4px 4px}
+.risco{width:56px;height:5px;border-radius:9px;background:var(--teal);margin:0 4px 12px}
+h2{font-size:1.25rem;color:var(--roxo);margin:.1em 0 .5em;font-weight:900}
+h3{margin:.6em 0 .3em;color:var(--roxo)}
+/* ---------- como ajudar ---------- */
+.ajudas{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ajudas a{background:linear-gradient(180deg,#fff,#F3EEF9);border:1px solid #ece3f5;border-radius:18px;padding:16px 6px 12px;text-align:center;text-decoration:none;color:var(--roxo);font-weight:800;font-size:1.02rem;line-height:1.15;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 4px 14px #5b1f8612}
+.ajudas a>svg:first-child{font-size:38px}
+.ajudas .seta{width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:18px;margin-top:auto}
+@media (max-width:520px){.ajudas{grid-template-columns:repeat(2,1fr)}}
+/* ---------- necessidades ---------- */
+.urg{background:#E5F6F2;border:1px solid #c9ece4;border-radius:20px;padding:14px;margin:14px 0}
+.urg h2{display:flex;gap:8px;align-items:center;color:var(--roxo);margin:0 0 10px}
+.urg h2 svg{color:var(--crit);font-size:30px}
+.urg .linha{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.urg .itens{display:flex;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+.urg .it{flex:1;min-width:68px;text-align:center;padding:2px 6px;border-left:1px solid #bfe3db;font-size:.85rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--tx);text-decoration:none}
+.urg .it:first-child{border-left:0}
+.urg .it svg{font-size:28px;color:var(--roxo)}
+.urg .btn{width:auto;margin:4px 0 4px 8px;padding:12px 18px;border-radius:16px;background:var(--teal);font-size:1.02rem}
+@media (max-width:520px){.urg .itens{flex-basis:100%}.urg .btn{width:100%;margin:10px 0 0}.urg .it{min-width:62px;font-size:.78rem}}
+/* ---------- transparência ---------- */
+.transp{background:linear-gradient(110deg,#4A1570,#7B2CA8);color:#fff;border-radius:20px;padding:14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0;box-shadow:0 8px 24px #5b1f8630}
+.transp .tt{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.2rem;line-height:1.1;flex:1 1 170px}
+.transp .tt svg{font-size:36px}
+.transp .nums{display:flex;flex:3 1 330px}
+.transp .nums div{flex:1;text-align:center;border-left:1px solid #ffffff40;padding:0 4px;font-size:.78rem;line-height:1.15}
+.transp .nums div:first-child{border-left:0}
+.transp .nums svg{font-size:20px;display:block;margin:0 auto 2px}
+.transp .nums b{display:block;font-size:1.25rem;font-weight:900}
+.transp .btn-borda{flex:0 0 auto}
+@media (max-width:520px){.transp .btn-borda{width:100%;justify-content:center}}
+/* ---------- navegação ---------- */
+nav.baixo{position:fixed;bottom:0;left:0;right:0;z-index:1000;display:flex;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -4px 18px #5b1f8618;padding:4px 4px env(safe-area-inset-bottom)}
+nav.baixo a{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 8px;color:var(--tx);text-decoration:none;font-size:.74rem;text-align:center;line-height:1.1;font-weight:600;position:relative}
+nav.baixo a svg{font-size:26px;stroke-width:1.6}
+nav.baixo a.on{color:var(--roxo);font-weight:900}
+nav.baixo a.on svg{fill:var(--roxo);fill-opacity:.18}
+nav.baixo a.on svg.lucide-house{fill-opacity:1}
+nav.baixo a.on:after{content:"";position:absolute;bottom:2px;width:38px;height:4px;border-radius:9px;background:var(--teal)}
+@media (max-width:440px){nav.baixo a{font-size:.64rem}nav.baixo a svg{font-size:23px}.transp .nums b{font-size:1.05rem}}
+@media (min-width:900px){nav.baixo{left:50%;transform:translateX(-50%);max-width:860px}}
+/* ---------- menu lateral ---------- */
+.veu{position:fixed;inset:0;background:#2a164066;z-index:2000;display:none}
+.veu.on{display:block}
+.gaveta{position:fixed;top:0;bottom:0;left:0;width:min(84vw,320px);background:#fff;z-index:2001;transform:translateX(-105%);transition:transform .2s;overflow:auto;padding:calc(14px + env(safe-area-inset-top)) 0 20px;box-shadow:4px 0 24px #0003}
+.gaveta.on{transform:none}
+.gaveta img{height:52px;margin:0 18px 10px}
+.gaveta a{display:flex;gap:12px;align-items:center;padding:12px 20px;color:var(--tx);text-decoration:none;font-weight:700}
+.gaveta a svg{color:var(--roxo);font-size:22px}
+.gaveta a:hover{background:#f5effb}
+.gaveta .sep{border-top:1px solid var(--linha);margin:8px 0}
+/* ---------- formulários e listas ---------- */
+label.cp{display:block;font-weight:700;font-size:.92rem;margin:10px 0 2px}
+label.cp em{color:var(--crit);font-style:normal}
+input,textarea,select{width:100%;padding:11px 12px;border:1.5px solid #d9cbe8;border-radius:12px;font:inherit;background:#fff;color:var(--tx)}
+textarea{resize:vertical}
+.chk{display:flex;gap:8px;align-items:flex-start;font-weight:600;margin:6px 0;font-size:.95rem}
+.chk input{width:20px;height:20px;flex:0 0 20px;margin-top:1px}
+.chks{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0 10px}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+@media (max-width:340px){.dupla{grid-template-columns:1fr}}
+.aviso{background:#FFF6E5;border:1px solid #F7DDAA;border-radius:14px;padding:10px 12px;font-size:.92rem;margin:8px 0}
+.ok{background:#E5F6F2;border:1px solid #bfe3db;border-radius:14px;padding:14px;font-weight:600}
+.item{padding:12px 0;border-bottom:1px solid var(--linha)}
+.item:last-child{border-bottom:0}
+.item small,.mut{color:var(--sub)}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:2px 10px;color:#fff;font-size:.78rem;font-weight:800;margin:2px 4px 2px 0;vertical-align:middle}
+.chip.cl{background:#efe7f7;color:var(--roxo)}
+.filtros{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:thin}
+.filtros button{flex:0 0 auto;border:1.5px solid #d9cbe8;background:#fff;color:var(--roxo);border-radius:99px;padding:7px 14px;font:inherit;font-weight:800;font-size:.9rem;cursor:pointer}
+.filtros button.on{background:var(--roxo);color:#fff;border-color:var(--roxo)}
+.vazio{color:var(--sub);font-style:italic}
+.grade2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:340px){.grade2{grid-template-columns:1fr}}
+.num{background:#F6F1FB;border-radius:16px;padding:12px;text-align:center}
+.num b{display:block;font-size:1.5rem;font-weight:900;color:var(--roxo)}
+.num small{color:var(--sub);font-weight:600}
+.tres .num:nth-child(1) b{color:var(--lar)}.tres .num:nth-child(2) b{color:var(--azul)}.tres .num:nth-child(3) b{color:var(--teal)}
+.tres{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:460px){.tres{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--linha)}
+th{color:var(--sub);font-size:.8rem}
+.voltar{display:inline-flex;gap:6px;align-items:center;color:var(--roxo);font-weight:800;text-decoration:none;margin:6px 4px}
+/* ---------- conversas ---------- */
+.chat{max-height:55vh;overflow:auto;background:#FAF7FD;border-radius:14px;padding:8px;margin:8px 0}
+.msg{background:#fff;border-radius:12px;padding:8px 10px;margin:6px 0;box-shadow:0 1px 3px #0000000d}
+.msg.eu{background:#EFE6FA;margin-left:12%}
+.msg.fix{border:2px solid var(--ama)}
+.msg small{color:var(--sub);font-size:.75rem}
+.msg .acoes a{font-size:.75rem;margin-left:8px}
+.enviar{display:flex;gap:8px}
+.enviar textarea{flex:1;min-height:46px}
+.enviar .btn{width:auto;margin:0}
+.abas{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:thin}
+.abas a{flex:0 0 auto;display:inline-flex;gap:6px;align-items:center;padding:8px 14px;border-radius:99px;background:#fff;border:1.5px solid #d9cbe8;color:var(--roxo);font-weight:800;text-decoration:none;font-size:.9rem}
+.abas a.on{background:var(--roxo);border-color:var(--roxo);color:#fff}
+.badge{background:var(--crit);color:#fff;border-radius:99px;padding:0 7px;font-size:.75rem}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:.9rem;margin:6px 0}
+.dl dt{color:var(--sub);font-weight:700}.dl dd{margin:0}
+.carregando{text-align:center;padding:40px;color:var(--sub)}
+.oculto{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--tx);color:#fff;padding:10px 18px;border-radius:12px;z-index:3000;font-weight:700;max-width:90vw;text-align:center}
+.rodape{text-align:center;color:var(--sub);font-size:.8rem;margin:22px 0 6px}
+</style>
+</head>
+<body>
+<header class="topo">
+  <button class="ib" onclick="menu(true)" aria-label="Abrir menu"><i data-lucide="menu"></i></button>
+  <a class="marca" href="#inicio"><img src="logo.png" alt="MAP Solidário"><span>Mobilização • Apoio • Proteção</span></a>
+  <div class="dir">
+    <a class="ib sino" href="#avisos" aria-label="Avisos"><i data-lucide="bell"></i><i class="ponto" id="ponto" hidden></i></a>
+    <a class="ib perfil" href="#comunidade" aria-label="Minha área"><i data-lucide="user"></i></a>
+  </div>
+</header>
+<div class="veu" id="veu" onclick="menu(false)"></div>
+<aside class="gaveta" id="gaveta" aria-label="Menu"></aside>
+<main id="app"><div class="carregando">Carregando…</div></main>
+<nav class="baixo" id="nav"></nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@1.78.0/dist/umd/lucide.min.js"></script>
+<script>
+// =====================================================================
+// CONFIGURAÇÃO — preencha as 4 linhas abaixo (entre as aspas)
+// =====================================================================
+const CFG = {
+  url: 'COLE_AQUI_A_PROJECT_URL_DO_SUPABASE',
+  key: 'COLE_AQUI_A_CHAVE_ANON_PUBLIC_DO_SUPABASE',
+  termoUrl: '',        // link do termo/cadastro de voluntário no MAP OS (se ficar vazio, o botão não aparece)
+  contato: ''          // e-mail de contato do MAP para dúvidas e pedidos de privacidade
+};
+// =====================================================================
+
+const sb = (CFG.url.startsWith('http') && window.supabase) ? supabase.createClient(CFG.url, CFG.key, {auth:{flowType:'implicit', persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}}) : null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const n = v => (v === null || v === undefined || v === '') ? '—' : Number(v).toLocaleString('pt-BR');
+const reais = v => { v = Number(v || 0); return v >= 1e6 ? 'R$ ' + (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1}) + ' mi' : v >= 1e4 ? 'R$ ' + Math.round(v/1e3).toLocaleString('pt-BR') + ' mil' : v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); };
+const reaisCheio = v => Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const data = d => d ? new Date(d).toLocaleDateString('pt-BR') : '';
+const dataHora = d => d ? new Date(d).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}) : '';
+const urlSegura = u => /^https?:\/\//i.test(String(u || '').trim()) ? String(u).trim() : '';
+const ico = (nome, extra = '') => `<i data-lucide="${nome}" ${extra}></i>`;
+const guardar = (k, v) => { try { localStorage.setItem('mapsol_' + k, v); } catch (e) {} };
+const ler = k => { try { return localStorage.getItem('mapsol_' + k); } catch (e) { return null; } };
+function toast(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
+
+// ---------- dicionários ----------
+const GRAV = {critica:['Crítica','#E0245E'], grave:['Grave','#F28C28'], moderada:['Moderada','#F2C21B'], monitoramento:['Monitoramento','#16A88F']};
+const CAT = {alimentos:['Alimentos','shopping-basket'], agua:['Água Potável','droplet'], colchoes:['Colchões','bed-double'], limpeza:['Limpeza','spray-can'], higiene:['Higiene','briefcase-medical'], telhas:['Telhas e Lonas','tent'], roupas:['Roupas e Cobertores','shirt'], medicamentos:['Medicamentos','pill'], pet:['Ração e itens pet','paw-print'], outros:['Outros','package']};
+const TIPO_INST = {doacao_dinheiro:'Doação em dinheiro (conta oficial)', doacao_materiais:'Recebe materiais', ponto_coleta:'Ponto de coleta', abrigo:'Abrigo', ong_pet:'ONG / protetor animal', orgao_publico:'Órgão público', outro:'Outro'};
+const FLUXO = {
+  voluntario:[['novo','Novo'],['contato','Em contato'],['termo','Termo assinado'],['liberado','Liberado na Comunidade'],['inativo','Inativo']],
+  empresa:[['novo','Nova'],['contato','Em contato'],['ativa','Parceria ativa'],['encerrada','Encerrada']],
+  indicacao:[['novo','Nova'],['abordagem','Em abordagem'],['parceria','Virou parceria'],['sem_interesse','Sem interesse']],
+  oferta:[['novo','Registrada'],['validada','Validada'],['confirmada','Confirmada'],['entregue','Entregue'],['cancelada','Cancelada']],
+  contribuicao:[['novo','Declarada'],['confirmada','Recebimento confirmado'],['comprovada','Aplicação comprovada'],['invalida','Inválida']],
+  resgate:[['novo','Novo'],['triagem','Triagem'],['atendimento','Em atendimento'],['encaminhado','Encaminhado'],['encerrado','Encerrado']],
+  lar:[['novo','Novo'],['verificado','Verificado'],['ativo','Ativo'],['inativo','Inativo']]
+};
+const NOME_TIPO = {voluntario:'Voluntários', empresa:'Empresas', indicacao:'Indicações', oferta:'Ofertas de materiais', contribuicao:'Contribuições', resgate:'Pet: resgates', lar:'Pet: lares temporários'};
+const ROTULO = {frentes:'Frentes', modalidade:'Modalidade', deslocamento:'Pode ir ao RS', disponibilidade:'Disponibilidade', habilidades:'Habilidades', profissao:'Profissão', experiencia:'Observações', cnpj:'CNPJ', segmento:'Segmento', responsavel:'Responsável', contribuicao:'Como pode contribuir', proposta:'Proposta', divulgar_marca:'Autoriza divulgar a marca', empresa:'Empresa indicada', contato_empresa:'Contato da empresa', potencial:'Por que indicar', categoria:'Categoria', descricao:'Descrição', quantidade:'Quantidade', unidade:'Unidade', validade:'Validade / disponibilidade', entrega:'Entrega', data:'Data', destino_outro:'Destino informado', especie:'Espécie', situacao:'Situação', urgencia:'Urgência', local:'Local', foto:'Foto', especies:'Espécies aceitas', vagas:'Vagas', transporte:'Tem transporte'};
+
+// ---------- estado ----------
+const S = {mob:null, cid:[], nec:[], inst:[], avisos:[], ind:{}, user:null, lib:[], com:null, grupo:null, filtroGrav:'', busca:'', filtroCad:'voluntario', filtroStatus:'', edit:null, enviando:false};
+const team = () => S.lib.some(l => l.papel === 'equipe' || l.papel === 'gestao');
+const gestao = () => S.lib.some(l => l.papel === 'gestao');
+const equipeDe = c => S.lib.some(l => l.papel === 'gestao' || (l.papel === 'equipe' && l.comunidade === c));
+let mapas = [], chatTimer = null;
+
+async function carregar(){
+  const m = await sb.from('mobilizacoes').select('*').eq('ativa', true).order('criada', {ascending:false}).limit(1);
+  S.mob = m.data?.[0] || null;
+  if (S.mob){
+    const id = S.mob.id;
+    const [c, ne, i, a, ind] = await Promise.all([
+      sb.from('cidades').select('*').eq('mobilizacao_id', id).order('nome'),
+      sb.from('necessidades').select('*').eq('mobilizacao_id', id).eq('atendida', false).order('atualizado', {ascending:false}),
+      sb.from('instituicoes').select('*').eq('mobilizacao_id', id).order('nome'),
+      sb.from('avisos').select('*').eq('publico', true).order('criado', {ascending:false}).limit(30),
+      sb.rpc('indicadores', {mob:id})
+    ]);
+    S.cid = c.data || []; S.nec = ne.data || []; S.inst = i.data || []; S.avisos = a.data || []; S.ind = ind.data || {};
+  }
+  await carregarUsuario();
+}
+async function carregarUsuario(){
+  const {data} = await sb.auth.getSession();
+  S.user = data.session?.user || null;
+  S.lib = S.user ? ((await sb.from('liberados').select('*').eq('email', S.user.email.toLowerCase())).data || []) : [];
+}
+
+// =====================================================================
+// MAPA
+// =====================================================================
+const RS = [[-52.044,-31.574],[-52.11,-31.554],[-52.102,-31.625],[-52.057,-31.598],[-52.069,-31.676],[-52.2,-31.728],[-52.225,-31.751],[-52.222,-31.843],[-52.256,-31.849],[-52.234,-31.894],[-52.221,-31.872],[-52.132,-31.923],[-52.108,-32.027],[-52.068,-32.03],[-52.098,-32.162],[-52.231,-32.257],[-52.306,-32.361],[-52.511,-32.903],[-52.629,-33.116],[-52.795,-33.302],[-53.152,-33.589],[-53.416,-33.748],[-53.442,-33.695],[-53.529,-33.687],[-53.535,-33.613],[-53.51,-33.535],[-53.45,-33.57],[-53.427,-33.434],[-53.47,-33.259],[-53.43,-33.156],[-53.392,-33.151],[-53.32,-33.055],[-53.318,-33.088],[-53.256,-33.102],[-53.159,-32.969],[-53.165,-32.879],[-53.123,-32.791],[-53.072,-32.832],[-52.982,-32.734],[-53.001,-32.793],[-52.894,-32.892],[-52.833,-32.913],[-52.75,-32.862],[-52.586,-32.526],[-52.693,-32.318],[-52.622,-32.143],[-52.737,-32.167],[-52.73,-32.195],[-52.766,-32.204],[-52.728,-32.212],[-52.795,-32.271],[-52.817,-32.34],[-52.788,-32.378],[-52.75,-32.361],[-52.724,-32.387],[-52.789,-32.445],[-52.953,-32.486],[-53.0,-32.597],[-53.061,-32.618],[-53.076,-32.656],[-53.174,-32.656],[-53.249,-32.604],[-53.287,-32.621],[-53.37,-32.57],[-53.388,-32.586],[-53.431,-32.565],[-53.463,-32.485],[-53.557,-32.471],[-53.644,-32.383],[-53.642,-32.296],[-53.734,-32.152],[-53.745,-32.078],[-53.833,-32.054],[-53.849,-32.001],[-53.958,-31.955],[-53.972,-31.918],[-54.039,-31.897],[-54.1,-31.927],[-54.454,-31.652],[-54.453,-31.6],[-54.585,-31.458],[-54.758,-31.425],[-54.835,-31.441],[-54.89,-31.376],[-54.938,-31.381],[-55.006,-31.268],[-55.073,-31.332],[-55.238,-31.26],[-55.29,-31.143],[-55.338,-31.132],[-55.35,-31.037],[-55.436,-31.004],[-55.44,-30.96],[-55.486,-30.947],[-55.577,-30.833],[-55.66,-30.869],[-55.642,-30.911],[-55.665,-30.952],[-55.722,-30.943],[-55.728,-30.979],[-55.869,-31.07],[-56.009,-31.081],[-55.989,-30.858],[-56.022,-30.786],[-56.128,-30.738],[-56.17,-30.615],[-56.26,-30.586],[-56.292,-30.521],[-56.383,-30.498],[-56.458,-30.385],[-56.488,-30.399],[-56.545,-30.358],[-56.539,-30.314],[-56.616,-30.301],[-56.613,-30.261],[-56.667,-30.218],[-56.645,-30.204],[-56.775,-30.164],[-56.807,-30.104],[-57.068,-30.086],[-57.114,-30.114],[-57.167,-30.199],[-57.16,-30.242],[-57.221,-30.29],[-57.259,-30.267],[-57.28,-30.294],[-57.31,-30.257],[-57.394,-30.304],[-57.465,-30.265],[-57.523,-30.285],[-57.566,-30.257],[-57.557,-30.212],[-57.643,-30.188],[-57.482,-30.123],[-57.345,-30.003],[-57.327,-29.88],[-57.278,-29.817],[-57.121,-29.764],[-56.968,-29.639],[-56.954,-29.583],[-56.81,-29.476],[-56.766,-29.377],[-56.705,-29.361],[-56.589,-29.12],[-56.413,-29.071],[-56.409,-28.977],[-56.303,-28.9],[-56.282,-28.788],[-56.183,-28.768],[-56.002,-28.599],[-56.01,-28.507],[-55.886,-28.48],[-55.901,-28.406],[-55.872,-28.359],[-55.745,-28.371],[-55.7,-28.426],[-55.667,-28.333],[-55.773,-28.272],[-55.773,-28.245],[-55.631,-28.176],[-55.608,-28.116],[-55.557,-28.162],[-55.493,-28.077],[-55.444,-28.096],[-55.369,-28.027],[-55.383,-27.983],[-55.316,-27.925],[-55.264,-27.931],[-55.196,-27.856],[-55.132,-27.896],[-55.107,-27.846],[-55.031,-27.855],[-55.08,-27.779],[-55.01,-27.797],[-54.936,-27.772],[-54.904,-27.725],[-54.903,-27.637],[-54.85,-27.623],[-54.812,-27.529],[-54.774,-27.585],[-54.682,-27.574],[-54.672,-27.505],[-54.621,-27.541],[-54.585,-27.454],[-54.53,-27.505],[-54.444,-27.473],[-54.469,-27.429],[-54.411,-27.405],[-54.346,-27.467],[-54.336,-27.401],[-54.28,-27.445],[-54.26,-27.397],[-54.211,-27.379],[-54.172,-27.254],[-54.154,-27.296],[-54.077,-27.297],[-54.011,-27.196],[-53.96,-27.194],[-53.949,-27.151],[-53.903,-27.174],[-53.874,-27.127],[-53.817,-27.174],[-53.773,-27.148],[-53.748,-27.19],[-53.666,-27.162],[-53.642,-27.22],[-53.563,-27.173],[-53.492,-27.202],[-53.506,-27.138],[-53.411,-27.14],[-53.372,-27.09],[-53.294,-27.134],[-53.309,-27.217],[-53.242,-27.17],[-53.188,-27.191],[-53.158,-27.138],[-53.133,-27.178],[-53.072,-27.157],[-53.076,-27.103],[-53.028,-27.08],[-53.043,-27.146],[-52.993,-27.138],[-52.977,-27.221],[-52.951,-27.162],[-52.925,-27.202],[-52.85,-27.169],[-52.844,-27.206],[-52.759,-27.215],[-52.754,-27.257],[-52.715,-27.236],[-52.699,-27.282],[-52.667,-27.238],[-52.631,-27.264],[-52.549,-27.238],[-52.479,-27.264],[-52.445,-27.217],[-52.419,-27.282],[-52.395,-27.292],[-52.381,-27.259],[-52.375,-27.304],[-52.346,-27.288],[-52.298,-27.317],[-52.301,-27.26],[-52.253,-27.257],[-52.234,-27.27],[-52.274,-27.302],[-52.212,-27.33],[-52.166,-27.273],[-52.166,-27.311],[-52.107,-27.309],[-52.097,-27.348],[-52.018,-27.331],[-52.02,-27.362],[-51.951,-27.381],[-52.007,-27.402],[-51.934,-27.432],[-51.955,-27.474],[-51.9,-27.464],[-51.889,-27.52],[-51.857,-27.475],[-51.847,-27.525],[-51.795,-27.53],[-51.798,-27.491],[-51.724,-27.513],[-51.687,-27.479],[-51.656,-27.52],[-51.631,-27.489],[-51.631,-27.538],[-51.58,-27.524],[-51.569,-27.584],[-51.49,-27.56],[-51.432,-27.655],[-51.386,-27.623],[-51.369,-27.672],[-51.316,-27.674],[-51.308,-27.719],[-51.235,-27.779],[-51.082,-27.834],[-51.01,-27.963],[-50.984,-27.942],[-50.928,-27.969],[-50.877,-28.041],[-50.901,-28.087],[-50.869,-28.137],[-50.828,-28.119],[-50.786,-28.143],[-50.788,-28.198],[-50.766,-28.188],[-50.749,-28.247],[-50.698,-28.266],[-50.625,-28.391],[-50.591,-28.382],[-50.536,-28.429],[-50.527,-28.404],[-50.379,-28.445],[-50.357,-28.42],[-50.345,-28.463],[-50.328,-28.434],[-50.271,-28.456],[-50.247,-28.429],[-50.223,-28.463],[-50.176,-28.452],[-50.157,-28.497],[-50.126,-28.429],[-50.1,-28.485],[-49.971,-28.439],[-49.943,-28.481],[-49.927,-28.451],[-49.858,-28.443],[-49.869,-28.48],[-49.839,-28.496],[-49.809,-28.468],[-49.783,-28.496],[-49.765,-28.46],[-49.77,-28.494],[-49.728,-28.518],[-49.748,-28.546],[-49.691,-28.618],[-49.782,-28.611],[-49.837,-28.667],[-49.821,-28.693],[-49.872,-28.704],[-49.875,-28.744],[-49.904,-28.707],[-49.935,-28.728],[-49.966,-28.873],[-49.929,-28.871],[-49.965,-28.922],[-49.92,-28.978],[-50.007,-29.072],[-49.954,-29.085],[-49.986,-29.136],[-50.014,-29.128],[-50.016,-29.181],[-50.076,-29.189],[-50.099,-29.163],[-50.093,-29.222],[-50.111,-29.237],[-50.093,-29.213],[-50.14,-29.193],[-50.166,-29.247],[-50.037,-29.351],[-50.114,-29.259],[-49.946,-29.2],[-49.711,-29.325],[-50.017,-29.772],[-50.333,-30.5],[-50.769,-31.11],[-51.25,-31.567],[-51.47,-31.726],[-51.885,-31.958],[-52.081,-32.157],[-52.04,-32.036],[-52.054,-31.982],[-52.013,-31.939],[-52.098,-31.835],[-52.004,-31.819],[-51.852,-31.867],[-51.787,-31.806],[-51.865,-31.799],[-51.664,-31.77],[-51.491,-31.569],[-51.436,-31.624],[-51.465,-31.564],[-51.429,-31.48],[-51.36,-31.529],[-51.238,-31.458],[-51.159,-31.281],[-51.168,-31.067],[-51.103,-31.099],[-50.98,-31.041],[-50.954,-31.003],[-50.966,-30.896],[-50.911,-30.905],[-50.753,-30.818],[-50.701,-30.746],[-50.686,-30.5],[-50.729,-30.368],[-50.699,-30.346],[-50.623,-30.392],[-50.627,-30.327],[-50.593,-30.4],[-50.648,-30.412],[-50.654,-30.442],[-50.574,-30.481],[-50.537,-30.273],[-50.597,-30.194],[-50.658,-30.199],[-50.673,-30.296],[-50.781,-30.284],[-50.775,-30.333],[-50.922,-30.332],[-50.93,-30.435],[-51.055,-30.391],[-51.041,-30.366],[-51.068,-30.354],[-51.025,-30.321],[-51.03,-30.274],[-51.086,-30.241],[-51.158,-30.262],[-51.198,-30.194],[-51.248,-30.186],[-51.225,-30.144],[-51.266,-30.103],[-51.23,-30.043],[-51.262,-30.054],[-51.295,-30.001],[-51.328,-30.226],[-51.273,-30.249],[-51.293,-30.303],[-51.247,-30.328],[-51.21,-30.297],[-51.184,-30.382],[-51.097,-30.357],[-51.095,-30.381],[-51.142,-30.471],[-51.141,-30.426],[-51.182,-30.407],[-51.258,-30.466],[-51.303,-30.588],[-51.295,-30.75],[-51.317,-30.648],[-51.386,-30.654],[-51.404,-30.782],[-51.369,-30.874],[-51.447,-30.873],[-51.496,-30.915],[-51.485,-31.026],[-51.44,-31.087],[-51.618,-31.139],[-51.642,-31.225],[-51.616,-31.267],[-51.79,-31.273],[-51.859,-31.332],[-51.869,-31.294],[-51.878,-31.324],[-51.919,-31.31],[-51.993,-31.413],[-52.032,-31.695],[-52.058,-31.679],[-52.028,-31.647],[-52.044,-31.574]];
+function pinoSvg(cor, num, grande){
+  const w = grande ? 40 : 30, h = grande ? 52 : 39;
+  return `<svg viewBox="0 0 34 44" width="${w}" height="${h}"><path d="M17 1.5C8.4 1.5 1.5 8.3 1.5 16.8c0 11 14.2 24.6 14.8 25.2a1 1 0 0 0 1.4 0c.6-.6 14.8-14.2 14.8-25.2C32.5 8.3 25.6 1.5 17 1.5z" fill="${cor}" stroke="#fff" stroke-width="2.5"/>${num !== '' ? `<text x="17" y="22" text-anchor="middle" font-size="${String(num).length > 2 ? 11 : 15}" font-weight="900" fill="#fff" font-family="Nunito,Arial,sans-serif">${num}</text>` : '<circle cx="17" cy="16.5" r="5.5" fill="#fff"/>'}</svg>`;
+}
+function criarMapa(el, opcoes = {}){
+  const map = L.map(el, {zoomControl:false, zoomSnap:.25, scrollWheelZoom: !!opcoes.grande, attributionControl:true}).setView([-30.0, -53.3], 6);
+  L.control.zoom({position:'bottomright', zoomInTitle:'Aproximar', zoomOutTitle:'Afastar'}).addTo(map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18, attribution:'© OpenStreetMap'}).addTo(map);
+  const estado = L.polygon(RS.map(p => [p[1], p[0]]), {color:'#0E8C77', weight:2, fillColor:'#18A88F', fillOpacity:.88, interactive:false}).addTo(map);
+  map.fitBounds(estado.getBounds(), {paddingTopLeft:[6, opcoes.grande ? 20 : 54], paddingBottomRight:[6, 6]});
+  const ajustar = () => estado.setStyle({fillOpacity: map.getZoom() >= 9 ? .12 : map.getZoom() >= 8 ? .45 : .88});
+  map.on('zoomend', ajustar);
+  map.attributionControl.setPrefix(false);
+  const camada = L.layerGroup().addTo(map);
+  const desenhar = () => desenharPinos(map, camada, opcoes.cidades || S.cid);
+  map.on('zoomend', desenhar); desenhar();
+  mapas.push(map);
+  return map;
+}
+function desenharPinos(map, camada, cidades){
+  camada.clearLayers();
+  const z = map.getZoom(), grupos = [];
+  for (const c of cidades){
+    if (!GRAV[c.gravidade]) continue;
+    if (c.destaque){ grupos.push({g:c.gravidade, itens:[c], destaque:true}); continue; }
+    const p = map.project([c.lat, c.lng], z);
+    const alvo = grupos.find(g => !g.destaque && g.g === c.gravidade && g.p.distanceTo(p) < 46);
+    if (alvo) alvo.itens.push(c); else grupos.push({g:c.gravidade, itens:[c], p});
+  }
+  for (const g of grupos){
+    const lat = g.itens.reduce((a, c) => a + c.lat, 0) / g.itens.length, lng = g.itens.reduce((a, c) => a + c.lng, 0) / g.itens.length;
+    const grande = !!g.destaque, cor = g.destaque ? '#B0174F' : GRAV[g.g][1];
+    const mk = L.marker([lat, lng], {icon: L.divIcon({className:'pino', html: pinoSvg(cor, g.itens.length, grande), iconSize: grande ? [40,52] : [30,39], iconAnchor: grande ? [20,50] : [15,37], popupAnchor:[0, grande ? -46 : -34]}), zIndexOffset: grande ? 1000 : 0}).addTo(camada);
+    if (g.destaque){
+      const c = g.itens[0];
+      mk.bindTooltip(`${esc(c.nome)}/${esc(c.uf || 'RS')}<br><small>(${c.gravidade === 'critica' ? 'mais afetada' : GRAV[c.gravidade][0].toLowerCase()})</small>`, {permanent:true, direction:'top', offset:[0,-48], className:'balao'});
+    }
+    if (g.itens.length > 1){
+      mk.on('click', () => map.fitBounds(L.latLngBounds(g.itens.map(c => [c.lat, c.lng])), {padding:[40,40], maxZoom:10}));
+    } else {
+      const c = g.itens[0];
+      mk.bindPopup(`<b>${esc(c.nome)}/${esc(c.uf || 'RS')}</b><br><span class="chip" style="background:${GRAV[c.gravidade][1]}">${GRAV[c.gravidade][0]}</span>${c.afetados ? '<br>' + n(c.afetados) + ' pessoas afetadas' : ''}${c.residencias_danos ? '<br>' + n(c.residencias_danos) + ' residências com danos' : ''}<br><a href="#cidade/${c.id}">Ver detalhes</a>`);
+    }
+  }
+}
+function limparMapas(){ mapas.forEach(m => { try { m.remove(); } catch (e) {} }); mapas = []; }
+
+// =====================================================================
+// TELAS PÚBLICAS
+// =====================================================================
+function destaque(){ return S.cid.find(c => c.destaque) || S.cid.find(c => c.gravidade === 'critica') || S.cid[0] || null; }
+function legenda(){
+  const linhas = Object.keys(GRAV).map(k => `<div>${pinoSvg(GRAV[k][1], '', false).replace('width="30" height="39"', 'width="20" height="26"')} ${GRAV[k][0]} <b>(${S.cid.filter(c => c.gravidade === k).length})</b></div>`).join('');
+  return `<div class="legenda">${linhas}<hr><div class="total">Total: <b>${S.cid.length} ${S.cid.length === 1 ? 'cidade' : 'cidades'}</b></div><a class="btn-linha" href="#cidades">Ver lista completa ${ico('arrow-right')}</a></div>`;
+}
+function inicio(){
+  const m = S.mob;
+  if (!m) return `<div class="card"><h2>Nenhuma mobilização ativa</h2><p class="mut">Assim que a equipe abrir uma mobilização, ela aparece aqui.</p></div>`;
+  const d = destaque(), ind = S.ind || {};
+  const capa = urlSegura(m.imagem_url) ? `style="background-image:url('${esc(m.imagem_url)}')"` : '';
+  const urg = [...new Set(S.nec.slice().sort((a, b) => (a.prioridade === 'urgente' ? 0 : 1) - (b.prioridade === 'urgente' ? 0 : 1)).map(x => x.categoria))].slice(0, 6);
+  return `
+  <section class="hero" ${capa}>
+    <span class="selo">${esc(m.chamada || 'Mobilização Emergencial')}</span>
+    <h1>${esc(m.nome)}</h1>
+    <p>${esc(m.descricao || '')}</p>
+    ${d ? `<a class="btn-borda" href="#cidade/${d.id}">Ver detalhes da cidade ${ico('arrow-right')}</a>` : ''}
+  </section>
+  ${d ? `<section class="stats" aria-label="Números de ${esc(d.nome)}">
+    <div>${ico('users')}<b>${n(d.habitantes)}</b><small>habitantes${d.fonte_habitantes ? `<em>(${esc(d.fonte_habitantes)})</em>` : ''}</small></div>
+    <div>${ico('house')}<b>${n(d.residencias)}</b><small>residências na cidade</small></div>
+    <div>${ico('triangle-alert')}<b>${n(d.residencias_danos)}</b><small>residências com danos</small></div>
+    <div>${ico('users-round')}<b>${n(d.afetados)}</b><small>pessoas afetadas</small></div>
+  </section>` : ''}
+  <section class="card mapacard">
+    <div><h2>Cidades Atingidas no ${esc(m.regiao === 'Rio Grande do Sul' ? 'RS' : (m.regiao || 'RS'))}</h2>${legenda()}</div>
+    <div style="position:relative"><div class="mapa" id="mapaInicio" aria-label="Mapa das cidades atingidas"></div><a class="mapa-expandir" href="#cidades" aria-label="Ampliar mapa">${ico('maximize-2')}</a></div>
+  </section>
+  <h2 class="titulo">Como você pode ajudar?</h2><div class="risco"></div>
+  <section class="ajudas">
+    <a href="#ajudar/voluntario">${ico('users')}Voluntariado<span class="seta">${ico('arrow-right')}</span></a>
+    <a href="#ajudar/doacoes">${ico('package')}Doações e Materiais<span class="seta">${ico('arrow-right')}</span></a>
+    <a href="#ajudar/parcerias">${ico('hand-heart')}Parcerias e Empresas<span class="seta">${ico('arrow-right')}</span></a>
+    <a href="#pet">${ico('paw-print')}Pet Solidário em Rede<span class="seta">${ico('arrow-right')}</span></a>
+  </section>
+  <section class="urg">
+    <h2>${ico('triangle-alert')} Necessidades Urgentes</h2>
+    <div class="linha"><div class="itens">${urg.map(k => `<a class="it" href="#ajudar/doacoes">${ico(CAT[k][1])}${CAT[k][0]}</a>`).join('') || '<span class="vazio">A equipe ainda está levantando as necessidades.</span>'}</div>
+    <a class="btn" href="#ajudar/doacoes">Contribuir Agora ${ico('arrow-right')}</a></div>
+  </section>
+  <section class="transp">
+    <div class="tt">${ico('chart-column')}<span>Transparência<br>e Resultados</span></div>
+    <div class="nums">
+      <div>${ico('users')}<b>${n(ind.voluntarios || 0)}</b>voluntários</div>
+      <div>${ico('package')}<b>${n(ind.ofertas || 0)}</b>doações materiais</div>
+      <div>${ico('hand-coins')}<b>${reais(ind.declarado)}</b>doações declaradas</div>
+      <div>${ico('paw-print')}<b>${n(ind.animais || 0)}</b>animais atendidos</div>
+    </div>
+    <a class="btn-borda" href="#transparencia">Acessar Transparência ${ico('arrow-right')}</a>
+  </section>
+  ${S.avisos.length ? `<div class="card"><h2>${ico('megaphone')} Últimas atualizações</h2>${S.avisos.slice(0, 3).map(a => `<div class="item"><b>${esc(a.titulo)}</b><br><small>${dataHora(a.criado)}</small>${a.texto ? `<div>${esc(a.texto)}</div>` : ''}</div>`).join('')}<a class="btn-linha" href="#avisos">Ver todos ${ico('arrow-right')}</a></div>` : ''}
+  <p class="rodape">MAP Solidário · SOS Army + Army Old · Movimento Army Power<br><a href="#privacidade">Privacidade</a></p>`;
+}
+
+function cidades(){
+  const lista = S.cid.filter(c => (!S.filtroGrav || c.gravidade === S.filtroGrav) && (!S.busca || c.nome.toLowerCase().includes(S.busca.toLowerCase())))
+    .sort((a, b) => Object.keys(GRAV).indexOf(a.gravidade) - Object.keys(GRAV).indexOf(b.gravidade) || (b.afetados || 0) - (a.afetados || 0));
+  return `<h2 class="titulo">Cidades atingidas</h2><div class="risco"></div>
+  <div class="card" style="padding:10px"><div class="mapa grande" id="mapaCidades"></div><div style="margin-top:8px">${Object.keys(GRAV).map(k => `<span class="chip" style="background:${GRAV[k][1]}">${GRAV[k][0]} (${S.cid.filter(c => c.gravidade === k).length})</span>`).join('')}</div></div>
+  <div class="card">
+    <input type="search" placeholder="Buscar cidade" value="${esc(S.busca)}" oninput="S.busca=this.value;listaCidades()">
+    <div class="filtros" style="margin-top:8px"><button class="${!S.filtroGrav ? 'on' : ''}" onclick="S.filtroGrav='';render()">Todas (${S.cid.length})</button>${Object.keys(GRAV).map(k => `<button class="${S.filtroGrav === k ? 'on' : ''}" onclick="S.filtroGrav='${k}';render()">${GRAV[k][0]}</button>`).join('')}</div>
+    <div id="listaCid">${linhasCidades(lista)}</div>
+  </div>`;
+}
+function linhasCidades(lista){
+  return lista.map(c => `<a class="item" href="#cidade/${c.id}" style="display:block;color:inherit;text-decoration:none"><span class="chip" style="background:${GRAV[c.gravidade][1]}">${GRAV[c.gravidade][0]}</span><b>${esc(c.nome)}/${esc(c.uf || 'RS')}</b> ${ico('chevron-right')}<br><small>${c.afetados ? n(c.afetados) + ' pessoas afetadas · ' : ''}${c.residencias_danos ? n(c.residencias_danos) + ' residências com danos · ' : ''}atualizado em ${data(c.atualizado)}</small></a>`).join('') || '<p class="vazio">Nenhuma cidade encontrada.</p>';
+}
+function listaCidades(){
+  const lista = S.cid.filter(c => (!S.filtroGrav || c.gravidade === S.filtroGrav) && (!S.busca || c.nome.toLowerCase().includes(S.busca.toLowerCase())));
+  $('#listaCid').innerHTML = linhasCidades(lista); icones();
+}
+function cidade(id){
+  const c = S.cid.find(x => x.id === id);
+  if (!c) return `<a class="voltar" href="#cidades">${ico('arrow-left')} Cidades</a><div class="card">Cidade não encontrada.</div>`;
+  const nec = S.nec.filter(x => x.cidade_id === c.id), inst = S.inst.filter(x => x.verificada && x.cidade && x.cidade.toLowerCase().includes(c.nome.toLowerCase()));
+  return `<a class="voltar" href="#cidades">${ico('arrow-left')} Todas as cidades</a>
+  <div class="card"><span class="chip" style="background:${GRAV[c.gravidade][1]}">${GRAV[c.gravidade][0]}</span>
+  <h2 style="font-size:1.8rem;margin-top:4px">${esc(c.nome)}/${esc(c.uf || 'RS')}</h2>
+  ${c.situacao ? `<p><b>Situação:</b> ${esc(c.situacao)}</p>` : ''}${c.nota ? `<p>${esc(c.nota)}</p>` : ''}
+  <div class="grade2">
+    <div class="num"><b>${n(c.habitantes)}</b><small>habitantes${c.fonte_habitantes ? ' (' + esc(c.fonte_habitantes) + ')' : ''}</small></div>
+    <div class="num"><b>${n(c.residencias)}</b><small>residências na cidade</small></div>
+    <div class="num"><b>${n(c.residencias_danos)}</b><small>residências com danos</small></div>
+    <div class="num"><b>${n(c.afetados)}</b><small>pessoas afetadas</small></div>
+    ${c.desalojados ? `<div class="num"><b>${n(c.desalojados)}</b><small>desalojados / desabrigados</small></div>` : ''}
+  </div>
+  <p class="mut" style="font-size:.85rem">${c.fonte ? 'Fonte: ' + esc(c.fonte) + ' · ' : ''}Atualizado em ${dataHora(c.atualizado)}. Onde aparece “—”, o dado ainda não foi confirmado.</p>
+  <div class="mapa" id="mapaCidade" style="height:220px"></div></div>
+  <div class="card"><h2>Do que ${esc(c.nome)} precisa</h2>${nec.map(x => `<div class="item">${ico(CAT[x.categoria][1])} <b>${esc(x.item)}</b>${x.prioridade === 'urgente' ? ' <span class="chip" style="background:var(--crit)">Urgente</span>' : ''}${x.quantidade ? '<br><small>Quantidade: ' + esc(x.quantidade) + '</small>' : ''}${x.onde_entregar ? '<br><small>Onde entregar: ' + esc(x.onde_entregar) + '</small>' : ''}</div>`).join('') || '<p class="vazio">Sem necessidades específicas publicadas para esta cidade. Veja as necessidades gerais.</p>'}
+  <a class="btn verde" href="#ajudar/doacoes">Quero ajudar ${ico('arrow-right')}</a></div>
+  ${inst.length ? `<div class="card"><h2>Instituições verificadas na cidade</h2>${inst.map(cartaoInst).join('')}</div>` : ''}`;
+}
+function cartaoInst(i){
+  const u = urlSegura(i.link);
+  return `<div class="item"><b>${esc(i.nome)}</b> <span class="chip cl">${esc(TIPO_INST[i.tipo] || i.tipo)}</span>${i.cidade ? '<br><small>' + esc(i.cidade) + '</small>' : ''}${i.descricao ? `<div>${esc(i.descricao)}</div>` : ''}${i.contato ? `<div><small>Contato: ${esc(i.contato)}</small></div>` : ''}${u ? `<a class="btn peq" href="${esc(u)}" target="_blank" rel="noopener">Acessar ${ico('external-link')}</a>` : ''}</div>`;
+}
+
+// ---------- ajudar ----------
+function ajudar(sub){
+  const abas = [['voluntario','Voluntariado','users'],['doacoes','Doações e materiais','package'],['parcerias','Parcerias e empresas','hand-heart'],['informe','Informar ocorrência','megaphone']];
+  sub = abas.some(a => a[0] === sub) ? sub : 'voluntario';
+  const topo = `<h2 class="titulo">Como você pode ajudar?</h2><div class="risco"></div><div class="abas">${abas.map(a => `<a class="${a[0] === sub ? 'on' : ''}" href="#ajudar/${a[0]}">${ico(a[2])} ${a[1]}</a>`).join('')}<a href="#pet">${ico('paw-print')} Pet Solidário</a></div>`;
+  return topo + ({voluntario:fVoluntario, doacoes:fDoacoes, parcerias:fParcerias, informe:fInforme})[sub]();
+}
+const SIM_NAO = [['sim','Sim'],['nao','Não']];
+const CONSENT = {k:'consentimento', l:'Autorizo o MAP a usar estes dados apenas para organizar esta mobilização e entrar em contato comigo. Posso pedir a exclusão quando quiser.', t:'check', req:true};
+const HABILIDADES = ['Logística e transporte','Comunicação e redes sociais','Captação de parcerias','Jurídico','Saúde','Psicologia','Veterinária','Assistência social','Cozinha','Motorista','Tradução','Tecnologia','Organização de doações','Outra'].map(x => [x, x]);
+function fVoluntario(){
+  return `<div class="card"><h2>${ico('users')} Seja voluntário</h2>
+  <p>Voluntários de qualquer lugar do mundo podem ajudar, no RS ou à distância. Depois do cadastro, a equipe entra em contato, você assina o termo de voluntariado e recebe acesso à Comunidade do MAP Solidário.</p>
+  ${form('voluntario', [
+    {k:'nome', l:'Nome completo', req:true},
+    {k:'email', l:'E-mail', t:'email', req:true},
+    {k:'telefone', l:'WhatsApp (com DDD ou código do país)', t:'tel', req:true},
+    {k:'cidade_pais', l:'Cidade, estado e país onde mora', req:true},
+    {k:'d_frentes', l:'Onde quer atuar', t:'select', opts:[['map','MAP Solidário (pessoas e cidades)'],['pet','Pet Solidário (animais)'],['ambos','As duas frentes']], req:true},
+    {k:'d_modalidade', l:'Modalidade', t:'select', opts:[['remoto','À distância (online)'],['presencial','Presencial no RS'],['ambos','As duas']], req:true},
+    {k:'d_deslocamento', l:'Pode se deslocar até as cidades atingidas?', t:'select', opts:SIM_NAO},
+    {k:'d_disponibilidade', l:'Disponibilidade (dias e horários)', ph:'Ex.: noites e fins de semana'},
+    {k:'d_profissao', l:'Profissão / formação'},
+    {k:'d_habilidades', l:'Em que pode ajudar', t:'checks', opts:HABILIDADES},
+    {k:'d_experiencia', l:'Algo mais que devemos saber?', t:'textarea'},
+    CONSENT
+  ], 'Quero ser voluntário')}</div>`;
+}
+function fDoacoes(){
+  const nec = S.nec.slice().sort((a, b) => (a.prioridade === 'urgente' ? 0 : 1) - (b.prioridade === 'urgente' ? 0 : 1));
+  const dinheiro = S.inst.filter(i => i.verificada && i.tipo === 'doacao_dinheiro');
+  const outras = S.inst.filter(i => i.verificada && i.tipo !== 'doacao_dinheiro' && i.frente !== 'pet');
+  return `<div class="card"><h2>${ico('triangle-alert')} O que está faltando agora</h2>${nec.map(x => { const c = S.cid.find(y => y.id === x.cidade_id); return `<div class="item">${ico(CAT[x.categoria][1])} <b>${esc(x.item)}</b>${x.prioridade === 'urgente' ? ' <span class="chip" style="background:var(--crit)">Urgente</span>' : ''}<br><small>${c ? esc(c.nome) + ' · ' : ''}${x.quantidade ? 'Quantidade: ' + esc(x.quantidade) + ' · ' : ''}${x.onde_entregar ? 'Entregar em: ' + esc(x.onde_entregar) : ''}</small></div>`; }).join('') || '<p class="vazio">A equipe ainda está levantando as necessidades.</p>'}</div>
+  <div class="card"><h2>${ico('landmark')} Doações em dinheiro</h2>
+  <div class="aviso"><b>O MAP não recebe dinheiro.</b> Doe direto para as contas oficiais abaixo, já verificadas pela equipe. Depois, se quiser, registre a sua doação aqui para entrar na transparência.</div>
+  ${dinheiro.map(cartaoInst).join('') || '<p class="vazio">As contas oficiais aparecem aqui assim que forem verificadas.</p>'}</div>
+  ${outras.length ? `<div class="card"><h2>${ico('map-pin')} Onde entregar materiais</h2>${outras.map(cartaoInst).join('')}</div>` : ''}
+  <div class="card"><h2>${ico('package')} Oferecer materiais ou serviços</h2><p>Tem alimentos, água, colchões, transporte ou um serviço para oferecer? Registre e a equipe combina com você o destino.</p>
+  ${form('oferta', [
+    {k:'d_categoria', l:'O que você oferece', t:'select', opts:Object.keys(CAT).map(k => [CAT[k][0], CAT[k][0]]).concat([['Transporte','Transporte'],['Serviço','Serviço']]), req:true},
+    {k:'d_descricao', l:'Descreva', t:'textarea', req:true},
+    {k:'d_quantidade', l:'Quantidade', half:true}, {k:'d_unidade', l:'Unidade (kg, caixas, litros…)', half:true},
+    {k:'cidade_pais', l:'Onde está (cidade e estado)', req:true},
+    {k:'d_entrega', l:'Como entregar', t:'select', opts:[['Eu levo até o local','Eu levo até o local'],['Precisa retirar comigo','Precisa retirar comigo'],['Envio por transportadora','Envio por transportadora']]},
+    {k:'d_validade', l:'Disponível até / validade'},
+    {k:'nome', l:'Seu nome ou empresa', req:true}, {k:'telefone', l:'WhatsApp', t:'tel', req:true}, {k:'email', l:'E-mail', t:'email'},
+    CONSENT
+  ], 'Registrar oferta')}</div>
+  <div class="card"><h2>${ico('hand-coins')} Registrar uma doação que você fez</h2><p class="mut">Só registro. O valor entra como “declarado” e passa a “confirmado” quando a instituição confirma o recebimento.</p>
+  ${form('contribuicao', [
+    {k:'instituicao_id', l:'Para quem você doou', t:'select', opts:[['','Selecione']].concat(S.inst.filter(i => i.verificada && i.tipo === 'doacao_dinheiro').map(i => [i.id, i.nome])).concat([['outra','Outra instituição']]), req:true},
+    {k:'d_destino_outro', l:'Se foi outra, qual?'},
+    {k:'valor', l:'Valor (R$)', t:'number', req:true, half:true}, {k:'d_data', l:'Data', t:'date', req:true, half:true},
+    {k:'nome', l:'Seu nome', req:true}, {k:'email', l:'E-mail (para a equipe pedir o comprovante, se precisar)', t:'email', req:true},
+    {k:'anonimo', l:'Não mostrar o meu nome publicamente', t:'check'},
+    CONSENT
+  ], 'Registrar doação')}</div>`;
+}
+function fParcerias(){
+  return `<div class="card"><h2>${ico('building')} Sua empresa ou instituição quer ajudar</h2>
+  ${form('empresa', [
+    {k:'nome', l:'Nome da empresa / instituição', req:true}, {k:'d_cnpj', l:'CNPJ (opcional)', half:true}, {k:'d_segmento', l:'Segmento', half:true},
+    {k:'d_responsavel', l:'Responsável', req:true}, {k:'email', l:'E-mail', t:'email', req:true, half:true}, {k:'telefone', l:'Telefone / WhatsApp', t:'tel', req:true, half:true},
+    {k:'cidade_pais', l:'Cidade, estado e país'},
+    {k:'d_contribuicao', l:'Como pode contribuir', t:'checks', opts:[['Produtos','Produtos'],['Serviços','Serviços'],['Transporte','Transporte'],['Espaço / armazenagem','Espaço / armazenagem'],['Divulgação','Divulgação'],['Voluntariado da equipe','Voluntariado da equipe'],['Doação direta às instituições','Doação direta às instituições']]},
+    {k:'d_proposta', l:'Conte a sua proposta e a capacidade de ajuda', t:'textarea', req:true},
+    {k:'d_divulgar_marca', l:'Autoriza mostrar a sua marca como parceira?', t:'select', opts:SIM_NAO},
+    CONSENT
+  ], 'Quero ser parceiro')}</div>
+  <div class="card"><h2>${ico('handshake')} Indique uma empresa</h2><p>Conhece uma empresa que pode ajudar? Indique e a equipe faz a abordagem.</p>
+  ${form('indicacao', [
+    {k:'d_empresa', l:'Nome da empresa', req:true}, {k:'d_segmento', l:'Segmento', half:true}, {k:'cidade_pais', l:'Cidade', half:true},
+    {k:'d_contato_empresa', l:'Contato da empresa (se souber)'}, {k:'d_potencial', l:'Por que ela pode ajudar?', t:'textarea'},
+    {k:'nome', l:'Seu nome', req:true}, {k:'telefone', l:'Seu WhatsApp', t:'tel', half:true}, {k:'email', l:'Seu e-mail', t:'email', half:true},
+    CONSENT
+  ], 'Enviar indicação')}
+  <button class="btn alt" onclick="compartilhar()">${ico('share-2')} Compartilhar a campanha</button></div>`;
+}
+function fInforme(){
+  return `<div class="card"><h2>${ico('megaphone')} Informar uma ocorrência</h2><p>Sabe de estragos, pessoas ilhadas ou uma cidade sem ajuda? Conte aqui. A equipe verifica antes de publicar no mapa.</p>
+  <div class="aviso">Em emergência com risco de vida, ligue <b>193</b> (Bombeiros) ou <b>199</b> (Defesa Civil).</div>
+  <form onsubmit="return enviarInforme(event)"><input class="oculto" name="site" tabindex="-1" autocomplete="off">
+  <label class="cp">Cidade <em>*</em></label><input name="cidade" required maxlength="120">
+  <label class="cp">O que aconteceu e onde <em>*</em></label><textarea name="texto" rows="4" required maxlength="3000"></textarea>
+  <label class="cp">Seu contato (opcional)</label><input name="contato" maxlength="200">
+  <button class="btn">Enviar informe</button></form></div>`;
+}
+function pet(){
+  const ongs = S.inst.filter(i => i.verificada && i.frente === 'pet'), ind = S.ind || {};
+  return `<h2 class="titulo">${ico('paw-print')} Pet Solidário em Rede</h2><div class="risco"></div>
+  <div class="card"><p>Proteção, saúde e acolhimento dos animais atingidos, junto com ONGs, protetores, universidades e clínicas parceiras.</p>
+  <div class="grade2"><div class="num"><b>${n(ind.animais || 0)}</b><small>animais atendidos</small></div><div class="num"><b>${n(ind.lares || 0)}</b><small>lares temporários ativos</small></div></div></div>
+  <div class="card"><h2>Pedir resgate ou atendimento</h2><div class="aviso">Em risco imediato, procure também os Bombeiros (193) ou a Defesa Civil (199).</div>
+  ${form('resgate', [
+    {k:'d_especie', l:'Espécie', t:'select', opts:[['Cão','Cão'],['Gato','Gato'],['Cavalo','Cavalo'],['Outro','Outro']], req:true, half:true}, {k:'d_quantidade', l:'Quantos animais', t:'number', half:true},
+    {k:'d_situacao', l:'Situação', t:'select', opts:[['Ferido','Ferido'],['Preso / ilhado','Preso / ilhado'],['Abandonado','Abandonado'],['Perdido','Perdido'],['Precisa de abrigo','Precisa de abrigo'],['Tutor precisa de apoio','Tutor precisa de apoio']], req:true},
+    {k:'d_urgencia', l:'Urgência', t:'select', opts:[['Alta','Alta'],['Média','Média'],['Baixa','Baixa']], req:true},
+    {k:'cidade_pais', l:'Cidade', req:true}, {k:'d_local', l:'Local ou ponto de referência', req:true},
+    {k:'d_descricao', l:'Conte o que está acontecendo', t:'textarea'}, {k:'d_foto', l:'Link de foto (opcional)', t:'url'},
+    {k:'nome', l:'Seu nome', req:true}, {k:'telefone', l:'WhatsApp', t:'tel', req:true},
+    CONSENT
+  ], 'Pedir ajuda', 'pet')}</div>
+  <div class="card"><h2>Oferecer lar temporário</h2><p class="mut">Não pedimos o seu endereço aqui. A equipe combina os detalhes com você.</p>
+  ${form('lar', [
+    {k:'nome', l:'Seu nome', req:true}, {k:'telefone', l:'WhatsApp', t:'tel', req:true, half:true}, {k:'email', l:'E-mail', t:'email', half:true},
+    {k:'cidade_pais', l:'Cidade e estado', req:true},
+    {k:'d_especies', l:'Aceita', t:'checks', opts:[['Cães','Cães'],['Gatos','Gatos'],['Outros','Outros']]},
+    {k:'d_vagas', l:'Quantas vagas', t:'number', half:true}, {k:'d_transporte', l:'Tem transporte?', t:'select', opts:SIM_NAO, half:true},
+    {k:'d_experiencia', l:'Observações', t:'textarea'},
+    CONSENT
+  ], 'Oferecer lar', 'pet')}</div>
+  <div class="card"><h2>ONGs, protetores e parceiros</h2>${ongs.map(cartaoInst).join('') || '<p class="vazio">Os parceiros aparecem aqui depois de verificados pela equipe.</p>'}</div>
+  <div class="card"><h2>Seja voluntário do Pet Solidário</h2><a class="btn" href="#ajudar/voluntario">Quero ser voluntário ${ico('arrow-right')}</a><a class="btn alt" href="#comunidade" onclick="S.com='pet'">Comunidade Pet Solidário</a></div>`;
+}
+async function transparencia(){
+  const ind = S.ind || {};
+  const t = S.mob ? ((await sb.rpc('transparencia', {mob:S.mob.id})).data || []) : [];
+  return `<h2 class="titulo">Transparência e Resultados</h2><div class="risco"></div>
+  <div class="card"><p>O MAP não recebe nem guarda dinheiro. Cada doação vai direto para uma instituição oficial verificada e aparece aqui em três etapas:</p>
+  <div class="tres"><div class="num"><b>${reaisCheio(ind.declarado)}</b><small>Declarado por quem doou</small></div><div class="num"><b>${reaisCheio(ind.confirmado)}</b><small>Recebimento confirmado</small></div><div class="num"><b>${reaisCheio(ind.comprovado)}</b><small>Aplicação comprovada com documento</small></div></div>
+  <p class="mut" style="font-size:.85rem">Valores ainda sem confirmação ou comprovação aparecem como pendentes. Isso é parte do processo, não uma irregularidade.</p></div>
+  <div class="card"><h2>Por destino</h2>${t.length ? `<table><tr><th>Destino</th><th>Declarado</th><th>Confirmado</th><th>Comprovado</th></tr>${t.map(r => `<tr><td>${urlSegura(r.link) ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.instituicao)}</a>` : esc(r.instituicao)}<br><small>${r.qtd} registro(s)</small></td><td>${reaisCheio(r.declarado)}</td><td>${reaisCheio(r.confirmado)}</td><td>${reaisCheio(r.comprovado)}</td></tr>`).join('')}</table>` : '<p class="vazio">Ainda não há doações registradas.</p>'}</div>
+  <div class="card"><h2>Mobilização em números</h2><div class="grade2">
+    <div class="num"><b>${n(ind.voluntarios || 0)}</b><small>voluntários cadastrados</small></div>
+    <div class="num"><b>${n(ind.ofertas || 0)}</b><small>ofertas de materiais e serviços</small></div>
+    <div class="num"><b>${n(ind.empresas || 0)}</b><small>empresas e instituições</small></div>
+    <div class="num"><b>${n(S.cid.length)}</b><small>cidades acompanhadas</small></div>
+    <div class="num"><b>${n(ind.animais || 0)}</b><small>animais atendidos</small></div>
+    <div class="num"><b>${n(ind.lares || 0)}</b><small>lares temporários ativos</small></div>
+  </div></div>
+  <a class="btn" href="#ajudar/doacoes">Quero contribuir ${ico('arrow-right')}</a>`;
+}
+function avisos(){
+  guardar('visto', new Date().toISOString()); $('#ponto').hidden = true;
+  return `<h2 class="titulo">${ico('bell')} Avisos</h2><div class="risco"></div><div class="card">${S.avisos.map(a => `<div class="item">${a.fixado ? '<span class="chip" style="background:var(--lar)">Fixado</span>' : ''}<b>${esc(a.titulo)}</b><br><small>${dataHora(a.criado)}</small>${a.texto ? `<div style="white-space:pre-line">${esc(a.texto)}</div>` : ''}</div>`).join('') || '<p class="vazio">Nenhum aviso por enquanto.</p>'}</div>`;
+}
+function privacidade(){
+  return `<h2 class="titulo">Privacidade</h2><div class="risco"></div><div class="card">
+  <p>O MAP Solidário pede só os dados necessários para organizar a ajuda: nome, contato, cidade e o que a pessoa oferece ou precisa.</p>
+  <p>Esses dados são vistos apenas pela equipe responsável pela mobilização e não são vendidos nem compartilhados para outros fins. Informações de animais e de tutores ficam só com a equipe do Pet Solidário.</p>
+  <p>Na página pública aparecem apenas totais. Quem registra uma doação pode pedir para não ter o nome divulgado.</p>
+  <p>Você pode pedir para ver, corrigir ou apagar os seus dados a qualquer momento${CFG.contato ? ` pelo e-mail <a href="mailto:${esc(CFG.contato)}">${esc(CFG.contato)}</a>` : ' falando com a equipe do MAP'}.</p>
+  <p class="mut">Seguimos a LGPD (Brasil) e o RGPD (União Europeia).</p></div>`;
+}
+
+// ---------- construtor de formulários ----------
+function campo(f, v = {}){
+  const val = f.k.startsWith('d_') ? (v.dados || {})[f.k.slice(2)] : v[f.k];
+  const req = f.req ? 'required' : '', star = f.req ? ' <em>*</em>' : '', ph = f.ph ? `placeholder="${esc(f.ph)}"` : '';
+  let h;
+  if (f.t === 'check') return `<label class="chk"><input type="checkbox" name="${f.k}" ${req} ${val ? 'checked' : ''}> <span>${esc(f.l)}${star}</span></label>`;
+  if (f.t === 'checks') return `<label class="cp">${esc(f.l)}${star}</label><div class="chks">${f.opts.map(o => `<label class="chk"><input type="checkbox" name="${f.k}" value="${esc(o[0])}" ${[].concat(val || []).includes(o[0]) ? 'checked' : ''}> <span>${esc(o[1])}</span></label>`).join('')}</div>`;
+  if (f.t === 'select') h = `<select name="${f.k}" ${req}>${!f.opts.some(o => o[0] === '') ? `<option value="">${f.req ? 'Selecione' : '—'}</option>` : ''}${f.opts.map(o => `<option value="${esc(o[0])}" ${String(val ?? '') === String(o[0]) ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>`;
+  else if (f.t === 'textarea') h = `<textarea name="${f.k}" rows="3" ${req} ${ph} maxlength="2000">${esc(val)}</textarea>`;
+  else if (f.t === 'file') h = `<input type="file" name="${f.k}" ${f.accept ? `accept="${f.accept}"` : ''}>`;
+  else h = `<input type="${f.t || 'text'}" name="${f.k}" ${req} ${ph} value="${esc(val)}" ${f.t === 'number' ? 'step="any" min="0"' : 'maxlength="300"'}>`;
+  return `<div ${f.half ? 'class="meio"' : ''}><label class="cp">${esc(f.l)}${star}</label>${h}</div>`;
+}
+function montarCampos(lista, v){
+  let h = '', buf = [];
+  const solta = () => { if (buf.length) { h += `<div class="dupla">${buf.join('')}</div>`; buf = []; } };
+  for (const f of lista){ if (f.half){ buf.push(campo(f, v)); if (buf.length === 2) solta(); } else { solta(); h += campo(f, v); } }
+  solta(); return h;
+}
+const FORMS = {};
+function form(tipo, lista, botao, frente = 'map'){
+  FORMS[tipo] = lista;
+  return `<form id="f_${tipo}" onsubmit="return enviarCadastro(event,'${tipo}','${frente}')"><input class="oculto" name="site" tabindex="-1" autocomplete="off">${montarCampos(lista)}<button class="btn">${esc(botao)}</button></form>`;
+}
+function coletar(formEl, lista){
+  const fd = new FormData(formEl), o = {}, dados = {};
+  for (const f of lista){
+    let v;
+    if (f.t === 'check') v = !!formEl.elements[f.k]?.checked;
+    else if (f.t === 'checks') v = fd.getAll(f.k);
+    else if (f.t === 'file') continue;
+    else { v = (fd.get(f.k) ?? '').toString().trim(); if (f.t === 'number') v = v === '' ? null : Number(String(v).replace(',', '.')); else if (v === '') v = null; }
+    if (f.k.startsWith('d_')){ if (v !== null && !(Array.isArray(v) && !v.length)) dados[f.k.slice(2)] = v; } else o[f.k] = v;
+  }
+  return {o, dados};
+}
+async function enviarCadastro(e, tipo, frente){
+  e.preventDefault();
+  const f = e.target;
+  if (f.site.value) return false;
+  if (S.enviando) return false;
+  const ultimo = Number(ler('ultimo') || 0);
+  if (Date.now() - ultimo < 15000){ toast('Aguarde alguns segundos antes de enviar de novo.'); return false; }
+  const {o, dados} = coletar(f, FORMS[tipo]);
+  const linha = {mobilizacao_id:S.mob?.id || null, tipo, frente, nome:o.nome || dados.empresa || '—', email:o.email ? o.email.toLowerCase() : null, telefone:o.telefone || null, cidade_pais:o.cidade_pais || null, valor:o.valor ?? null, anonimo:!!o.anonimo, consentimento:!!o.consentimento, dados};
+  if (o.instituicao_id && o.instituicao_id !== 'outra') linha.instituicao_id = o.instituicao_id;
+  if (tipo === 'voluntario' && dados.frentes === 'pet') linha.frente = 'pet';
+  S.enviando = true;
+  const btn = f.querySelector('button'); btn.disabled = true; btn.textContent = 'Enviando…';
+  const {error} = await sb.from('cadastros').insert(linha);
+  S.enviando = false;
+  if (error){ btn.disabled = false; btn.textContent = 'Tentar de novo'; toast('Não foi possível enviar. Confira os campos e a internet.'); console.error(error); return false; }
+  guardar('ultimo', Date.now());
+  const msgs = {
+    voluntario:`<b>Cadastro recebido! Obrigado por somar.</b><br>A equipe vai falar com você pelo WhatsApp ou e-mail. ${CFG.termoUrl ? `O próximo passo é assinar o termo de voluntariado:<a class="btn" href="${esc(CFG.termoUrl)}" target="_blank" rel="noopener">Assinar o termo de voluntariado</a>` : 'Em seguida você recebe o termo de voluntariado para assinar.'}<br>Depois que a equipe liberar o seu e-mail, você entra na Comunidade pelo ícone de perfil, no alto da página.`,
+    oferta:'<b>Oferta registrada!</b><br>A equipe vai combinar com você o destino e a entrega.',
+    contribuicao:'<b>Doação registrada!</b><br>Ela entra na transparência como “declarada” e muda de etapa quando a instituição confirmar.',
+    empresa:'<b>Recebemos a sua proposta!</b><br>A equipe de parcerias entra em contato em breve.',
+    indicacao:'<b>Indicação recebida!</b><br>Obrigado. A equipe vai fazer a abordagem.',
+    resgate:'<b>Pedido recebido!</b><br>A equipe do Pet Solidário vai fazer a triagem e falar com você pelo WhatsApp.',
+    lar:'<b>Obrigado por abrir a sua casa!</b><br>A equipe do Pet Solidário entra em contato.'
+  };
+  f.outerHTML = `<div class="ok">${msgs[tipo]}</div><button class="btn alt" onclick="compartilhar()">${ico('share-2')} Chamar mais gente</button>`;
+  icones(); return false;
+}
+async function enviarInforme(e){
+  e.preventDefault();
+  const f = e.target; if (f.site.value) return false;
+  const o = {cidade:f.cidade.value.trim(), texto:f.texto.value.trim(), contato:f.contato.value.trim() || null, mobilizacao_id:S.mob?.id || null};
+  const {error} = await sb.from('informes').insert(o);
+  if (error){ toast('Não foi possível enviar.'); console.error(error); return false; }
+  f.outerHTML = '<div class="ok"><b>Recebemos o seu informe.</b><br>A equipe vai verificar antes de colocar no mapa. Obrigado!</div>';
+  return false;
+}
+async function compartilhar(){
+  const url = location.origin + location.pathname, texto = `MAP Solidário: veja como ajudar ${S.mob?.nome || 'as cidades atingidas no RS'}.`;
+  try { if (navigator.share) return await navigator.share({title:'MAP Solidário', text:texto, url}); } catch (e) { return; }
+  try { await navigator.clipboard.writeText(texto + ' ' + url); toast('Link copiado. É só colar no WhatsApp.'); } catch (e) { prompt('Copie o link:', url); }
+}
+
+// =====================================================================
+// COMUNIDADE
+// =====================================================================
+async function comunidade(){
+  if (!S.user) return `<h2 class="titulo">Comunidade</h2><div class="risco"></div><div class="card"><h2>Entrar</h2>
+    <p>Para voluntários com termo assinado e para a equipe. Digite o seu e-mail: enviamos um link de acesso (e um código).</p>
+    <input id="em" type="email" placeholder="Seu e-mail" autocomplete="email"><button class="btn" onclick="entrar()">Receber link de acesso</button>
+    <div id="passo2" hidden><label class="cp">Recebeu um código no e-mail? Digite aqui:</label><input id="cod" inputmode="numeric" maxlength="10" placeholder="Código"><button class="btn alt" onclick="conferirCodigo()">Entrar com o código</button></div>
+    <p id="msgLogin" class="mut"></p></div>
+    <div class="card"><h2>Ainda não é voluntário?</h2><a class="btn verde" href="#ajudar/voluntario">Quero ser voluntário ${ico('arrow-right')}</a></div>`;
+  if (!S.lib.length) return `<h2 class="titulo">Comunidade</h2><div class="risco"></div><div class="card"><h2>Entrada ainda não liberada</h2>
+    <p>O e-mail <b>${esc(S.user.email)}</b> ainda não foi liberado. Depois do cadastro de voluntário e da assinatura do termo, a equipe libera o seu acesso.</p>
+    <a class="btn" href="#ajudar/voluntario">Fazer cadastro de voluntário</a>${CFG.termoUrl ? `<a class="btn alt" href="${esc(CFG.termoUrl)}" target="_blank" rel="noopener">Assinar o termo</a>` : ''}<button class="btn alt" onclick="sair()">Sair</button></div>`;
+  const cs = gestao() ? ['map','pet'] : [...new Set(S.lib.map(l => l.comunidade))];
+  if (!cs.includes(S.com)) S.com = cs[0];
+  const nome = {map:'MAP Solidário', pet:'Pet Solidário'};
+  const [gr, av] = await Promise.all([
+    sb.from('grupos').select('*').eq('comunidade', S.com).eq('arquivado', false).order('nome'),
+    sb.from('avisos').select('*').eq('publico', false).or(`comunidade.eq.${S.com},comunidade.is.null`).order('criado', {ascending:false}).limit(10)
+  ]);
+  const grupos = (gr.data || []).filter(x => !x.so_equipe || equipeDe(S.com)), mural = av.data || [];
+  if (S.grupo && !grupos.some(g => g.id === S.grupo)) S.grupo = null;
+  const g = grupos.find(x => x.id === S.grupo);
+  return `<h2 class="titulo">Comunidade</h2><div class="risco"></div>
+  ${cs.length > 1 ? `<div class="abas">${cs.map(c => `<a class="${c === S.com ? 'on' : ''}" href="#comunidade" onclick="S.com='${c}';S.grupo=null;render();return false">${ico(c === 'pet' ? 'paw-print' : 'users')} ${nome[c]}</a>`).join('')}</div>` : ''}
+  ${team() ? `<a class="btn verde" href="#equipe">${ico('settings')} Área da equipe</a>` : ''}
+  ${mural.length ? `<div class="card"><h2>${ico('pin')} Mural da equipe</h2>${mural.map(a => `<div class="item"><b>${esc(a.titulo)}</b><br><small>${dataHora(a.criado)}</small>${a.texto ? `<div style="white-space:pre-line">${esc(a.texto)}</div>` : ''}</div>`).join('')}</div>` : ''}
+  <div class="card"><h2>${ico('message-circle')} Grupos de conversa</h2>
+  <div class="filtros">${grupos.map(x => `<button class="${x.id === S.grupo ? 'on' : ''}" onclick="S.grupo='${x.id}';render()">${esc(x.nome)}</button>`).join('') || '<span class="vazio">Nenhum grupo ainda.</span>'}</div>
+  ${g ? `${g.descricao ? `<p class="mut">${esc(g.descricao)}</p>` : ''}<div class="chat" id="chat"><div class="carregando">Carregando conversa…</div></div>
+  <div class="enviar"><textarea id="tx" placeholder="Escreva uma mensagem" maxlength="4000" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMsg()}"></textarea><button class="btn" onclick="enviarMsg()" aria-label="Enviar">${ico('send')}</button></div>` : '<p class="mut">Escolha um grupo para conversar.</p>'}
+  </div>
+  <p class="mut" style="text-align:center">Você entrou como ${esc(S.user.email)}</p><button class="btn alt" onclick="sair()">${ico('log-out')} Sair</button>`;
+}
+async function entrar(){
+  const email = $('#em').value.trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(email)) return toast('Digite um e-mail válido.');
+  $('#msgLogin').textContent = 'Enviando…';
+  const {error} = await sb.auth.signInWithOtp({email, options:{emailRedirectTo: location.origin + location.pathname, shouldCreateUser:true}});
+  if (error){ $('#msgLogin').textContent = /rate|limit|seconds/i.test(error.message) ? 'Muitos pedidos em pouco tempo. Espere um minuto e tente de novo.' : 'Erro: ' + error.message; return; }
+  $('#msgLogin').textContent = 'Pronto! Abra o link que enviamos para o seu e-mail (veja também o spam). Se preferir, use o código.';
+  $('#passo2').hidden = false;
+}
+async function conferirCodigo(){
+  const email = $('#em').value.trim().toLowerCase(), token = $('#cod').value.trim();
+  if (!token) return;
+  const {error} = await sb.auth.verifyOtp({email, token, type:'email'});
+  if (error) return $('#msgLogin').textContent = 'Código inválido ou vencido. Peça um novo.';
+  await carregarUsuario(); render();
+}
+async function sair(){ await sb.auth.signOut(); S.user = null; S.lib = []; S.grupo = null; location.hash = '#inicio'; render(); }
+const nomeAutor = e => team() ? e : String(e).split('@')[0];
+async function carregarMsgs(rolarFim){
+  if (!S.grupo) return;
+  const {data, error} = await sb.from('mensagens').select('*').eq('grupo_id', S.grupo).order('criada', {ascending:false}).limit(200);
+  const c = $('#chat'); if (!c || error) return;
+  const lista = (data || []).reverse(), fix = lista.filter(m => m.fixada);
+  const perto = rolarFim || c.scrollTop + c.clientHeight >= c.scrollHeight - 30;
+  const eu = S.user.email.toLowerCase();
+  const linha = m => `<div class="msg ${m.autor === eu ? 'eu' : ''} ${m.fixada ? 'fix' : ''}"><small><b>${esc(nomeAutor(m.autor))}</b> · ${dataHora(m.criada)}${m.fixada ? ' · 📌 fixada' : ''}</small><div style="white-space:pre-line">${esc(m.texto)}</div><div class="acoes" style="text-align:right">${team() ? `<a href="#" onclick="fixar(${m.id},${!m.fixada});return false">${m.fixada ? 'desafixar' : 'fixar'}</a>` : ''}${team() || m.autor === eu ? `<a href="#" onclick="apagarMsg(${m.id});return false">apagar</a>` : ''}</div></div>`;
+  c.innerHTML = (fix.length ? `<div style="border-bottom:2px dashed var(--ama);margin-bottom:8px">${fix.map(linha).join('')}</div>` : '') + (lista.filter(m => !m.fixada).map(linha).join('') || '<p class="vazio">Nenhuma mensagem ainda. Comece a conversa!</p>');
+  if (perto) c.scrollTop = c.scrollHeight;
+}
+async function enviarMsg(){
+  const t = $('#tx').value.trim(); if (!t) return;
+  $('#tx').value = '';
+  const {error} = await sb.from('mensagens').insert({grupo_id:S.grupo, autor:S.user.email.toLowerCase(), texto:t});
+  if (error){ $('#tx').value = t; return toast('Não enviou. Tente de novo.'); }
+  carregarMsgs(true);
+}
+async function fixar(id, v){ await sb.from('mensagens').update({fixada:v}).eq('id', id); carregarMsgs(); }
+async function apagarMsg(id){ if (!confirm('Apagar esta mensagem?')) return; await sb.from('mensagens').delete().eq('id', id); carregarMsgs(); }
+
+// =====================================================================
+// ÁREA DA EQUIPE
+// =====================================================================
+const ABAS_EQ = [['resumo','Resumo','layout-dashboard'],['cadastros','Cadastros','clipboard-list'],['informes','Informes','megaphone'],['cidades','Cidades e mapa','map-pin'],['necessidades','Necessidades','triangle-alert'],['instituicoes','Instituições e links','landmark'],['avisos','Avisos','bell'],['grupos','Grupos','message-circle'],['documentos','Documentos','file-text'],['acessos','Acessos','user-check'],['mobilizacao','Mobilização','settings']];
+async function equipe(sub){
+  if (!S.user || !team()) return `<div class="card"><h2>Área restrita</h2><p>Só a equipe do MAP Solidário entra aqui.</p><a class="btn" href="#comunidade">Entrar</a></div>`;
+  sub = ABAS_EQ.some(a => a[0] === sub) ? sub : 'resumo';
+  const abas = ABAS_EQ.filter(a => a[0] !== 'mobilizacao' || gestao());
+  const corpo = await ({resumo:eqResumo, cadastros:eqCadastros, informes:eqInformes, cidades:eqCidades, necessidades:eqNecessidades, instituicoes:eqInstituicoes, avisos:eqAvisos, grupos:eqGrupos, documentos:eqDocumentos, acessos:eqAcessos, mobilizacao:eqMobilizacao})[sub]();
+  return `<h2 class="titulo">Área da equipe</h2><div class="risco"></div><div class="abas">${abas.map(a => `<a class="${a[0] === sub ? 'on' : ''}" href="#equipe/${a[0]}">${ico(a[2])} ${a[1]}</a>`).join('')}</div>${corpo}`;
+}
+async function eqResumo(){
+  const [inf, cad] = await Promise.all([
+    sb.from('informes').select('id', {count:'exact', head:true}).eq('estado', 'recebido'),
+    sb.from('cadastros').select('tipo,status').eq('status', 'novo')
+  ]);
+  const novos = {}; (cad.data || []).forEach(c => novos[c.tipo] = (novos[c.tipo] || 0) + 1);
+  const pend = S.inst.filter(i => !i.verificada).length;
+  return `<div class="card"><h2>O que precisa de atenção</h2><div class="grade2">
+    <a class="num" href="#equipe/informes" style="text-decoration:none"><b>${inf.count || 0}</b><small>informes novos</small></a>
+    <a class="num" href="#equipe/instituicoes" style="text-decoration:none"><b>${pend}</b><small>instituições para verificar</small></a>
+    ${Object.keys(NOME_TIPO).filter(t => equipeDe(['resgate','lar'].includes(t) ? 'pet' : 'map')).map(t => `<a class="num" href="#equipe/cadastros" onclick="S.filtroCad='${t}';S.filtroStatus='novo'" style="text-decoration:none"><b>${novos[t] || 0}</b><small>${NOME_TIPO[t]} novos</small></a>`).join('')}
+  </div></div>
+  <div class="card"><h2>Mapa e necessidades</h2><p>${S.cid.length} cidades no mapa · ${S.nec.length} necessidades abertas</p><a class="btn alt" href="#equipe/cidades">Atualizar o mapa</a><a class="btn alt" href="#equipe/necessidades">Atualizar necessidades</a></div>`;
+}
+// ---------- cadastros ----------
+async function eqCadastros(){
+  const tipos = Object.keys(NOME_TIPO).filter(t => equipeDe(['resgate','lar'].includes(t) ? 'pet' : 'map'));
+  if (!tipos.includes(S.filtroCad)) S.filtroCad = tipos[0];
+  let q = sb.from('cadastros').select('*').eq('tipo', S.filtroCad).order('criado', {ascending:false}).limit(500);
+  if (S.filtroStatus) q = q.eq('status', S.filtroStatus);
+  const {data, error} = await q;
+  if (error) return `<div class="card">Erro ao carregar: ${esc(error.message)}</div>`;
+  S.cadLista = data || [];
+  const fl = FLUXO[S.filtroCad];
+  return `<div class="filtros">${tipos.map(t => `<button class="${t === S.filtroCad ? 'on' : ''}" onclick="S.filtroCad='${t}';S.filtroStatus='';render()">${NOME_TIPO[t]}</button>`).join('')}</div>
+  <div class="filtros"><button class="${!S.filtroStatus ? 'on' : ''}" onclick="S.filtroStatus='';render()">Todos</button>${fl.map(s => `<button class="${S.filtroStatus === s[0] ? 'on' : ''}" onclick="S.filtroStatus='${s[0]}';render()">${s[1]}</button>`).join('')}</div>
+  <div class="card"><div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 style="margin:0">${NOME_TIPO[S.filtroCad]} (${S.cadLista.length})</h2><button class="btn peq alt" onclick="exportarCSV()">${ico('download')} Planilha</button></div>
+  ${S.cadLista.map(cartaoCadastro).join('') || '<p class="vazio">Nada por aqui.</p>'}</div>`;
+}
+function zap(t){ const d = String(t || '').replace(/\D/g, ''); return d.length >= 10 ? `https://wa.me/${d.length <= 11 ? '55' + d : d}` : ''; }
+function cartaoCadastro(c){
+  const dados = Object.entries(c.dados || {}).map(([k, v]) => `<dt>${esc(ROTULO[k] || k)}</dt><dd>${k === 'foto' && urlSegura(v) ? `<a href="${esc(v)}" target="_blank" rel="noopener">abrir</a>` : esc(Array.isArray(v) ? v.join(', ') : v)}</dd>`).join('');
+  const inst = c.instituicao_id ? S.inst.find(i => i.id === c.instituicao_id) : null;
+  const z = zap(c.telefone);
+  return `<div class="item" id="c_${c.id}"><span class="chip cl">${esc((FLUXO[c.tipo].find(s => s[0] === c.status) || [0, c.status])[1])}</span><b>${esc(c.nome)}</b>${c.anonimo ? ' <span class="chip cl">anônimo no público</span>' : ''}<br>
+  <small>${dataHora(c.criado)}${c.cidade_pais ? ' · ' + esc(c.cidade_pais) : ''}</small>
+  <dl class="dl">${c.email ? `<dt>E-mail</dt><dd><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></dd>` : ''}${c.telefone ? `<dt>Telefone</dt><dd>${z ? `<a href="${z}" target="_blank" rel="noopener">${esc(c.telefone)}</a>` : esc(c.telefone)}</dd>` : ''}${c.valor != null ? `<dt>Valor</dt><dd>${reaisCheio(c.valor)}</dd>` : ''}${inst ? `<dt>Destino</dt><dd>${esc(inst.nome)}</dd>` : ''}${dados}</dl>
+  <details><summary style="cursor:pointer;font-weight:800;color:var(--roxo)">Acompanhar</summary>
+  <label class="cp">Etapa</label><select id="st_${c.id}">${FLUXO[c.tipo].map(s => `<option value="${s[0]}" ${s[0] === c.status ? 'selected' : ''}>${s[1]}</option>`).join('')}</select>
+  <label class="cp">Responsável na equipe</label><input id="rp_${c.id}" value="${esc(c.responsavel)}">
+  <label class="cp">Link do grupo (WhatsApp/Telegram)</label><input id="lk_${c.id}" value="${esc(c.link_grupo)}">
+  <label class="cp">Notas internas</label><textarea id="nt_${c.id}" rows="3">${esc(c.notas_internas)}</textarea>
+  <button class="btn peq" onclick="salvarCadastro('${c.id}')">Salvar</button>
+  ${c.tipo === 'voluntario' && c.email ? `<button class="btn peq verde" onclick="liberarVol('${c.id}')">${ico('user-check')} Liberar na Comunidade</button>` : ''}
+  ${gestao() ? `<button class="btn peq perigo" onclick="apagarReg('cadastros','${c.id}')">Apagar (pedido do titular)</button>` : ''}
+  </details></div>`;
+}
+async function salvarCadastro(id){
+  const v = {status:$('#st_' + id).value, responsavel:$('#rp_' + id).value.trim() || null, link_grupo:$('#lk_' + id).value.trim() || null, notas_internas:$('#nt_' + id).value.trim() || null, atualizado:new Date().toISOString()};
+  const {error} = await sb.from('cadastros').update(v).eq('id', id);
+  if (error) return toast('Não salvou: ' + error.message);
+  toast('Salvo.'); S.ind = (await sb.rpc('indicadores', {mob:S.mob.id})).data || S.ind; render();
+}
+async function liberarVol(id){
+  const c = S.cadLista.find(x => x.id === id); if (!c) return;
+  const coms = c.dados?.frentes === 'ambos' ? ['map','pet'] : [c.frente];
+  if (!confirm(`Liberar ${c.email} na Comunidade ${coms.map(x => x === 'pet' ? 'Pet Solidário' : 'MAP Solidário').join(' e ')}? Faça isso só depois do termo assinado.`)) return;
+  for (const com of coms){
+    const {error} = await sb.from('liberados').insert({email:c.email.toLowerCase(), comunidade:com, papel:'voluntario', nome:c.nome});
+    if (error && error.code !== '23505') return toast('Não liberou: ' + error.message);
+  }
+  await sb.from('cadastros').update({status:'liberado', atualizado:new Date().toISOString()}).eq('id', id);
+  toast('Liberado! Avise a pessoa para entrar pelo ícone de perfil com este e-mail.'); render();
+}
+function exportarCSV(){
+  const L = S.cadLista || []; if (!L.length) return toast('Nada para exportar.');
+  const chaves = [...new Set(L.flatMap(c => Object.keys(c.dados || {})))];
+  const cab = ['Data','Nome','E-mail','Telefone','Cidade/país','Etapa','Valor','Responsável','Notas'].concat(chaves.map(k => ROTULO[k] || k));
+  const cel = v => '"' + String(Array.isArray(v) ? v.join(', ') : (v ?? '')).replace(/"/g, '""') + '"';
+  const linhas = L.map(c => [dataHora(c.criado), c.nome, c.email, c.telefone, c.cidade_pais, (FLUXO[c.tipo].find(s => s[0] === c.status) || [0, c.status])[1], c.valor ?? '', c.responsavel, c.notas_internas].concat(chaves.map(k => (c.dados || {})[k])).map(cel).join(';'));
+  const blob = new Blob(['﻿' + [cab.map(cel).join(';')].concat(linhas).join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `map-solidario-${S.filtroCad}-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+}
+// ---------- informes ----------
+async function eqInformes(){
+  const {data} = await sb.from('informes').select('*').order('criado', {ascending:false}).limit(200);
+  const L = data || [], cor = {recebido:'var(--lar)', verificando:'var(--azul)', confirmado:'var(--teal)', descartado:'#9a8bae'};
+  return `<div class="card"><h2>Informes recebidos</h2><p class="mut">Confirmou? Cadastre ou atualize a cidade em “Cidades e mapa”.</p>${L.map(i => `<div class="item"><span class="chip" style="background:${cor[i.estado]}">${esc(i.estado)}</span><b>${esc(i.cidade)}</b> <small>${dataHora(i.criado)}</small><div style="white-space:pre-line">${esc(i.texto)}</div><small>Contato: ${esc(i.contato || 'não informado')}${i.verificado_por ? ' · por ' + esc(i.verificado_por) : ''}</small><br>
+  <button class="btn peq alt" onclick="estadoInforme('${i.id}','verificando')">Verificando</button><button class="btn peq verde" onclick="estadoInforme('${i.id}','confirmado')">Confirmar</button><button class="btn peq perigo" onclick="estadoInforme('${i.id}','descartado')">Descartar</button></div>`).join('') || '<p class="vazio">Nenhum informe ainda.</p>'}</div>`;
+}
+async function estadoInforme(id, v){
+  const {error} = await sb.from('informes').update({estado:v, verificado_por:S.user.email}).eq('id', id);
+  if (error) return toast(error.message);
+  if (v === 'confirmado') toast('Confirmado. Agora atualize a cidade no mapa.');
+  render();
+}
+// ---------- cadastro genérico (cidades, necessidades, instituições, avisos) ----------
+const CAMPOS = {
+  cidades:[{k:'nome', l:'Cidade', req:true, half:true}, {k:'uf', l:'UF', half:true},
+    {k:'lat', l:'Latitude', t:'number', req:true, half:true}, {k:'lng', l:'Longitude', t:'number', req:true, half:true},
+    {k:'gravidade', l:'Gravidade', t:'select', opts:Object.keys(GRAV).map(k => [k, GRAV[k][0]]), req:true},
+    {k:'destaque', l:'Cidade em destaque na capa (mostra os números dela no topo)', t:'check'},
+    {k:'habitantes', l:'Habitantes', t:'number', half:true}, {k:'fonte_habitantes', l:'Fonte dos habitantes (ex.: IBGE 2026)', half:true},
+    {k:'residencias', l:'Residências na cidade', t:'number', half:true}, {k:'residencias_danos', l:'Residências com danos', t:'number', half:true},
+    {k:'afetados', l:'Pessoas afetadas', t:'number', half:true}, {k:'desalojados', l:'Desalojados / desabrigados', t:'number', half:true},
+    {k:'situacao', l:'Situação atual (aparece na página da cidade)'}, {k:'nota', l:'Observação pública', t:'textarea'}, {k:'fonte', l:'Fonte dos dados (ex.: Defesa Civil RS, 23/11)'}],
+  necessidades:[{k:'categoria', l:'Categoria', t:'select', opts:Object.keys(CAT).map(k => [k, CAT[k][0]]), req:true, half:true}, {k:'prioridade', l:'Prioridade', t:'select', opts:[['urgente','Urgente'],['alta','Alta'],['normal','Normal']], req:true, half:true},
+    {k:'item', l:'Item (ex.: colchões de solteiro)', req:true}, {k:'quantidade', l:'Quantidade', half:true}, {k:'cidade_id', l:'Cidade', t:'select', opts:[], half:true},
+    {k:'onde_entregar', l:'Onde entregar'}, {k:'atendida', l:'Já foi atendida (sai da lista pública)', t:'check'}],
+  instituicoes:[{k:'nome', l:'Nome', req:true}, {k:'tipo', l:'Tipo', t:'select', opts:Object.entries(TIPO_INST), req:true, half:true}, {k:'frente', l:'Frente', t:'select', opts:[['map','MAP Solidário'],['pet','Pet Solidário']], req:true, half:true},
+    {k:'cidade', l:'Cidade'}, {k:'link', l:'Link (site oficial, página de doação, Instagram)', t:'url'}, {k:'contato', l:'Contato público (Pix oficial, telefone ou e-mail)'},
+    {k:'descricao', l:'Descrição', t:'textarea'}, {k:'verificada', l:'Verificada pela equipe (só aparece no público quando marcada)', t:'check'}],
+  avisos:[{k:'titulo', l:'Título', req:true}, {k:'texto', l:'Texto', t:'textarea'},
+    {k:'publico', l:'Aviso público (aparece no sino para todos). Desmarcado = só no mural da Comunidade', t:'check'},
+    {k:'comunidade', l:'Comunidade (para avisos internos)', t:'select', opts:[['','As duas'],['map','MAP Solidário'],['pet','Pet Solidário']]},
+    {k:'fixado', l:'Fixar no topo', t:'check'}]
+};
+function formReg(tabela, titulo){
+  const v = S.edit?.t === tabela ? S.edit.v : (tabela === 'avisos' ? {publico:true} : tabela === 'cidades' ? {uf:'RS'} : {});
+  if (tabela === 'necessidades') CAMPOS.necessidades[4].opts = [['','Geral (todas as cidades)']].concat(S.cid.map(c => [c.id, c.nome]));
+  return `<div class="card" id="formReg"><h2>${S.edit?.t === tabela ? 'Editar' : titulo}</h2><form onsubmit="return salvarReg(event,'${tabela}')">${montarCampos(CAMPOS[tabela], v)}<button class="btn">${S.edit?.t === tabela ? 'Salvar alterações' : 'Salvar'}</button>${S.edit?.t === tabela ? `<button type="button" class="btn alt" onclick="S.edit=null;render()">Cancelar</button>` : ''}</form></div>`;
+}
+async function salvarReg(e, tabela){
+  e.preventDefault();
+  const {o} = coletar(e.target, CAMPOS[tabela]);
+  if (tabela === 'cidades'){ o.uf = (o.uf || 'RS').toUpperCase(); o.atualizado = new Date().toISOString(); o.atualizado_por = S.user.email; if (o.destaque) await sb.from('cidades').update({destaque:false}).eq('mobilizacao_id', S.mob.id).neq('id', S.edit?.v?.id || '00000000-0000-0000-0000-000000000000'); }
+  if (tabela === 'necessidades') o.atualizado = new Date().toISOString();
+  if (tabela === 'instituicoes' && o.link && !urlSegura(o.link)) o.link = 'https://' + o.link.replace(/^\/+/, '');
+  if (tabela === 'avisos'){ o.autor = S.user.email; o.comunidade = o.comunidade || null; }
+  let r;
+  if (S.edit?.t === tabela) r = await sb.from(tabela).update(o).eq('id', S.edit.v.id);
+  else { o.mobilizacao_id = S.mob?.id; if (tabela === 'instituicoes') o.criado_por = S.user.email; r = await sb.from(tabela).insert(o); }
+  if (r.error) return toast('Não salvou: ' + r.error.message), false;
+  S.edit = null; toast('Salvo.'); await carregar(); render(); return false;
+}
+function editar(tabela, id, lista){ S.edit = {t:tabela, v:(lista || S['_' + tabela] || []).find(x => x.id === id)}; render().then(() => $('#formReg')?.scrollIntoView({behavior:'smooth'})); }
+async function apagarReg(tabela, id){
+  if (!confirm('Apagar definitivamente? Não dá para desfazer.')) return;
+  const {error} = await sb.from(tabela).delete().eq('id', id);
+  if (error) return toast('Não apagou: ' + error.message);
+  toast('Apagado.'); await carregar(); render();
+}
+async function eqCidades(){
+  S._cidades = S.cid;
+  return `${formReg('cidades', 'Nova cidade no mapa')}
+  <div class="card"><h2>Achar as coordenadas</h2><p class="mut">Digite o nome e toque em Buscar, ou toque no mapa no lugar certo. As coordenadas vão direto para o formulário acima.</p>
+  <div style="display:flex;gap:8px"><input id="buscaGeo" placeholder="Nome da cidade"><button class="btn peq" style="margin:0" onclick="buscarCoord()">${ico('search')} Buscar</button></div>
+  <div class="mapa" id="mapaEquipe" style="height:320px;margin-top:8px"></div></div>
+  <div class="card"><h2>Cidades no mapa (${S.cid.length})</h2>${S.cid.map(c => `<div class="item"><span class="chip" style="background:${GRAV[c.gravidade][1]}">${GRAV[c.gravidade][0]}</span><b>${esc(c.nome)}</b>${c.destaque ? ' <span class="chip" style="background:var(--mag)">Destaque</span>' : ''}<br><small>Atualizado ${dataHora(c.atualizado)}${c.atualizado_por ? ' por ' + esc(c.atualizado_por) : ''}</small><br><button class="btn peq alt" onclick="editar('cidades','${c.id}')">${ico('pencil')} Editar</button><button class="btn peq perigo" onclick="apagarReg('cidades','${c.id}')">Apagar</button></div>`).join('') || '<p class="vazio">Nenhuma cidade ainda.</p>'}</div>`;
+}
+function preencherCoord(lat, lng){
+  const f = $('#formReg form'); if (!f) return;
+  f.lat.value = (+lat).toFixed(5); f.lng.value = (+lng).toFixed(5);
+  toast('Coordenadas preenchidas no formulário.');
+}
+async function buscarCoord(){
+  const q = $('#buscaGeo').value.trim(); if (!q) return;
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&q=${encodeURIComponent(q + ', Rio Grande do Sul, Brasil')}`);
+    const j = await r.json();
+    if (!j.length) return toast('Não encontrei. Tente tocar no mapa.');
+    const f = $('#formReg form'); if (f && !f.nome.value) f.nome.value = q;
+    preencherCoord(j[0].lat, j[0].lon);
+    const m = mapas[mapas.length - 1]; if (m){ m.setView([j[0].lat, j[0].lon], 10); }
+  } catch (e) { toast('Busca indisponível agora. Toque no mapa.'); }
+}
+async function eqNecessidades(){
+  const {data} = await sb.from('necessidades').select('*').eq('mobilizacao_id', S.mob?.id).order('atendida').order('atualizado', {ascending:false});
+  S._necessidades = data || [];
+  return `${formReg('necessidades', 'Nova necessidade')}<div class="card"><h2>Necessidades</h2>${S._necessidades.map(x => { const c = S.cid.find(y => y.id === x.cidade_id); return `<div class="item" style="${x.atendida ? 'opacity:.55' : ''}">${ico(CAT[x.categoria][1])} <b>${esc(x.item)}</b> <span class="chip cl">${esc(x.prioridade)}</span>${x.atendida ? ' <span class="chip" style="background:var(--teal)">Atendida</span>' : ''}<br><small>${c ? esc(c.nome) : 'Geral'}${x.quantidade ? ' · ' + esc(x.quantidade) : ''}</small><br><button class="btn peq alt" onclick="editar('necessidades','${x.id}')">${ico('pencil')} Editar</button><button class="btn peq ${x.atendida ? 'alt' : 'verde'}" onclick="marcarAtendida('${x.id}',${!x.atendida})">${x.atendida ? 'Reabrir' : 'Marcar atendida'}</button><button class="btn peq perigo" onclick="apagarReg('necessidades','${x.id}')">Apagar</button></div>`; }).join('') || '<p class="vazio">Nenhuma necessidade ainda.</p>'}</div>`;
+}
+async function marcarAtendida(id, v){ await sb.from('necessidades').update({atendida:v, atualizado:new Date().toISOString()}).eq('id', id); await carregar(); render(); }
+async function eqInstituicoes(){
+  S._instituicoes = S.inst;
+  return `${formReg('instituicoes', 'Nova instituição ou link')}<div class="aviso">Confira o link e a conta oficial antes de marcar como verificada. Só as verificadas aparecem para o público.</div>
+  <div class="card"><h2>Instituições (${S.inst.length})</h2>${S.inst.map(i => `<div class="item">${i.verificada ? '<span class="chip" style="background:var(--teal)">Verificada</span>' : '<span class="chip" style="background:var(--lar)">Não verificada</span>'}<b>${esc(i.nome)}</b> <span class="chip cl">${esc(TIPO_INST[i.tipo])}</span> <span class="chip cl">${i.frente === 'pet' ? 'Pet' : 'MAP'}</span><br><small>${esc(i.cidade || '')} ${urlSegura(i.link) ? `· <a href="${esc(i.link)}" target="_blank" rel="noopener">abrir link</a>` : ''}</small><br><button class="btn peq alt" onclick="editar('instituicoes','${i.id}')">${ico('pencil')} Editar</button><button class="btn peq perigo" onclick="apagarReg('instituicoes','${i.id}')">Apagar</button></div>`).join('') || '<p class="vazio">Nenhuma ainda.</p>'}</div>`;
+}
+async function eqAvisos(){
+  const {data} = await sb.from('avisos').select('*').order('criado', {ascending:false}).limit(100);
+  S._avisos = data || [];
+  return `${formReg('avisos', 'Novo aviso')}<div class="card"><h2>Avisos publicados</h2>${S._avisos.map(a => `<div class="item"><span class="chip ${a.publico ? '' : 'cl'}" style="${a.publico ? 'background:var(--teal)' : ''}">${a.publico ? 'Público' : 'Interno' + (a.comunidade ? ' · ' + (a.comunidade === 'pet' ? 'Pet' : 'MAP') : '')}</span><b>${esc(a.titulo)}</b><br><small>${dataHora(a.criado)} · ${esc(a.autor || '')}</small><br><button class="btn peq alt" onclick="editar('avisos','${a.id}')">${ico('pencil')} Editar</button><button class="btn peq perigo" onclick="apagarReg('avisos','${a.id}')">Apagar</button></div>`).join('') || '<p class="vazio">Nenhum aviso.</p>'}</div>`;
+}
+async function eqGrupos(){
+  const {data} = await sb.from('grupos').select('*').order('comunidade').order('nome');
+  const L = data || [];
+  const coms = ['map','pet'].filter(equipeDe);
+  return `<div class="card"><h2>Novo grupo de conversa</h2><form onsubmit="return novoGrupo(event)"><label class="cp">Nome <em>*</em></label><input name="nome" required><label class="cp">Descrição</label><input name="descricao"><label class="cp">Comunidade</label><select name="comunidade">${coms.map(c => `<option value="${c}">${c === 'pet' ? 'Pet Solidário' : 'MAP Solidário'}</option>`).join('')}</select><label class="chk"><input type="checkbox" name="so_equipe"> <span>Só equipe e gestão (voluntários não veem)</span></label><button class="btn">Criar grupo</button></form></div>
+  <div class="card"><h2>Grupos</h2>${L.map(g => `<div class="item" style="${g.arquivado ? 'opacity:.5' : ''}"><b>${esc(g.nome)}</b> <span class="chip cl">${g.comunidade === 'pet' ? 'Pet' : 'MAP'}</span>${g.so_equipe ? ' <span class="chip cl">só equipe</span>' : ''}${g.arquivado ? ' <span class="chip cl">arquivado</span>' : ''}<br><button class="btn peq alt" onclick="arquivarGrupo('${g.id}',${!g.arquivado})">${g.arquivado ? 'Reativar' : 'Arquivar'}</button></div>`).join('') || '<p class="vazio">Nenhum grupo.</p>'}</div>`;
+}
+async function novoGrupo(e){
+  e.preventDefault(); const f = e.target;
+  const {error} = await sb.from('grupos').insert({nome:f.nome.value.trim(), descricao:f.descricao.value.trim() || null, comunidade:f.comunidade.value, so_equipe:f.so_equipe.checked, mobilizacao_id:S.mob?.id || null});
+  if (error) return toast('Não criou: ' + error.message), false;
+  toast('Grupo criado.'); render(); return false;
+}
+async function arquivarGrupo(id, v){ const {error} = await sb.from('grupos').update({arquivado:v}).eq('id', id); if (error) toast(error.message); render(); }
+// ---------- acessos ----------
+async function eqAcessos(){
+  const {data} = await sb.from('liberados').select('*').order('papel').order('email');
+  const L = data || [], P = {gestao:'Gestão', equipe:'Equipe', voluntario:'Voluntário'};
+  return `<div class="card"><h2>Liberar acesso</h2><p class="mut">Voluntário: só depois do termo assinado. ${gestao() ? 'Equipe e Gestão: só a Gestão libera.' : ''}</p><form onsubmit="return liberarAcesso(event)">
+  <label class="cp">E-mail <em>*</em></label><input name="email" type="email" required><label class="cp">Nome</label><input name="nome">
+  <div class="dupla"><div><label class="cp">Comunidade</label><select name="comunidade"><option value="map">MAP Solidário</option><option value="pet">Pet Solidário</option></select></div>
+  <div><label class="cp">Papel</label><select name="papel"><option value="voluntario">Voluntário</option>${gestao() ? '<option value="equipe">Equipe</option><option value="gestao">Gestão</option>' : ''}</select></div></div>
+  <button class="btn">Liberar</button></form></div>
+  <div class="card"><h2>Quem tem acesso (${L.length})</h2>${L.map(l => `<div class="item"><span class="chip ${l.papel === 'voluntario' ? 'cl' : ''}" style="${l.papel === 'gestao' ? 'background:var(--mag)' : l.papel === 'equipe' ? 'background:var(--roxo)' : ''}">${P[l.papel]}</span><b>${esc(l.nome || l.email)}</b><br><small>${esc(l.email)} · ${l.comunidade === 'pet' ? 'Pet Solidário' : 'MAP Solidário'}</small>${(gestao() || l.papel === 'voluntario') && l.email !== S.user.email.toLowerCase() ? `<br><button class="btn peq perigo" onclick="removerAcesso('${esc(l.email)}','${l.comunidade}')">Remover acesso</button>` : ''}</div>`).join('')}</div>`;
+}
+async function liberarAcesso(e){
+  e.preventDefault(); const f = e.target;
+  const o = {email:f.email.value.trim().toLowerCase(), nome:f.nome.value.trim() || null, comunidade:f.comunidade.value, papel:f.papel.value};
+  const {error} = await sb.from('liberados').insert(o);
+  if (error) return toast(error.code === '23505' ? 'Este e-mail já está liberado nesta comunidade.' : 'Não liberou: ' + error.message), false;
+  toast('Acesso liberado.'); render(); return false;
+}
+async function removerAcesso(email, com){
+  if (!confirm(`Remover o acesso de ${email}?`)) return;
+  const {error} = await sb.from('liberados').delete().eq('email', email).eq('comunidade', com);
+  if (error) return toast(error.message); toast('Acesso removido.'); render();
+}
+// ---------- mobilização (gestão) ----------
+async function eqMobilizacao(){
+  const {data: hist} = await sb.from('historico').select('*').order('quando', {ascending:false}).limit(40);
+  const m = S.mob || {};
+  const AC = {update:'alterou', delete:'apagou', insert:'criou'};
+  return `${S.mob ? `<div class="card"><h2>Mobilização ativa</h2><form onsubmit="return salvarMob(event)">
+    <label class="cp">Nome (título da capa)</label><input name="nome" value="${esc(m.nome)}" required>
+    <label class="cp">Selo verde da capa</label><input name="chamada" value="${esc(m.chamada)}">
+    <label class="cp">Região</label><input name="regiao" value="${esc(m.regiao)}">
+    <label class="cp">Descrição</label><textarea name="descricao" rows="3">${esc(m.descricao)}</textarea>
+    <label class="cp">Imagem de fundo da capa (JPG ou PNG, de preferência larga)</label><input type="file" name="imagem" accept="image/*">
+    ${m.imagem_url ? `<label class="chk"><input type="checkbox" name="tirar"> <span>Remover a imagem atual</span></label>` : ''}
+    <button class="btn">Salvar</button></form>
+    <button class="btn perigo" onclick="encerrarMob()">Encerrar esta mobilização</button></div>` : ''}
+  <div class="card"><h2>Nova mobilização</h2><p class="mut">A mobilização ativa mais recente é a que aparece na página inicial.</p><form onsubmit="return novaMob(event)"><label class="cp">Nome <em>*</em></label><input name="nome" required placeholder="Ex.: Enchentes no Vale do Taquari"><label class="cp">Região</label><input name="regiao"><label class="cp">Descrição</label><textarea name="descricao" rows="2"></textarea><button class="btn">Criar mobilização</button></form></div>
+  <div class="card"><h2>Histórico de alterações</h2>${(hist || []).map(h => `<div class="item"><small>${dataHora(h.quando)}</small><br><b>${esc(h.quem || 'sistema')}</b> ${AC[h.acao] || h.acao} em <b>${esc(h.tabela)}</b>${h.depois?.nome || h.antes?.nome ? ': ' + esc(h.depois?.nome || h.antes?.nome) : h.depois?.titulo ? ': ' + esc(h.depois.titulo) : ''}</div>`).join('') || '<p class="vazio">Sem alterações registradas.</p>'}</div>`;
+}
+async function salvarMob(e){
+  e.preventDefault(); const f = e.target;
+  const o = {nome:f.nome.value.trim(), chamada:f.chamada.value.trim() || null, regiao:f.regiao.value.trim() || null, descricao:f.descricao.value.trim() || null};
+  try {
+    const arq = f.imagem.files[0];
+    if (arq){
+      if (arq.size > 5e6) return toast('Imagem muito grande (máx. 5 MB).'), false;
+      const p = `capa-${Date.now()}-${arq.name.replace(/[^\w.-]/g, '_')}`;
+      const up = await sb.storage.from('imagens').upload(p, arq, {contentType:arq.type});
+      if (up.error) throw up.error;
+      o.imagem_url = sb.storage.from('imagens').getPublicUrl(p).data.publicUrl;
+    } else if (f.tirar?.checked) o.imagem_url = null;
+    const {error} = await sb.from('mobilizacoes').update(o).eq('id', S.mob.id);
+    if (error) throw error;
+    toast('Mobilização atualizada.'); await carregar(); render();
+  } catch (er) { toast('Não salvou: ' + er.message); }
+  return false;
+}
+async function novaMob(e){
+  e.preventDefault(); const f = e.target;
+  const {error} = await sb.from('mobilizacoes').insert({nome:f.nome.value.trim(), regiao:f.regiao.value.trim() || null, descricao:f.descricao.value.trim() || null});
+  if (error) return toast(error.message), false;
+  toast('Mobilização criada.'); await carregar(); render(); return false;
+}
+async function encerrarMob(){
+  if (!confirm('Encerrar esta mobilização? Ela sai da página inicial (os dados continuam guardados).')) return;
+  await sb.from('mobilizacoes').update({ativa:false}).eq('id', S.mob.id); await carregar(); location.hash = '#inicio';
+}
+// ---------- documentos ----------
+const STD = {aguardando:['Aguardando resposta','#F28C28'], respondido:['Respondido','#16A88F'], sem_retorno:['Sem retorno','#8a7a9e']};
+async function eqDocumentos(){
+  const d = (await sb.from('documentos').select('*').order('criado', {ascending:false})).data || [];
+  const mod = d.filter(x => x.tipo === 'modelo'), env = d.filter(x => x.tipo === 'enviado');
+  const abrir = (p, t) => p ? `<a href="#" onclick="abrirArq('${esc(p)}');return false">${t}</a>` : '';
+  return `<div class="card"><h2>Novo documento</h2><form onsubmit="return novoDoc(event)">
+    <label class="cp">Tipo</label><select name="tipo"><option value="modelo">Modelo (ofício, pedido, termo para reutilizar)</option><option value="enviado">Documento enviado (guardar cópia)</option></select>
+    <label class="cp">Título <em>*</em></label><input name="titulo" required>
+    <label class="cp">Destinatário (para enviados)</label><input name="destinatario">
+    <div class="dupla"><div><label class="cp">Data do envio</label><input type="date" name="enviado_em" value="${new Date().toISOString().slice(0, 10)}"></div><div><label class="cp">Arquivo (PDF, Word, imagem)</label><input type="file" name="arquivo"></div></div>
+    <label class="cp">Observações</label><textarea name="notas" rows="2"></textarea><button class="btn">Salvar documento</button></form></div>
+  <div class="card"><h2>Modelos (${mod.length})</h2>${mod.map(x => `<div class="item"><b>${esc(x.titulo)}</b><br><small>${esc(x.notas || '')}</small><br>${abrir(x.arquivo, 'Abrir arquivo')}</div>`).join('') || '<p class="vazio">Nenhum modelo ainda.</p>'}</div>
+  <div class="card"><h2>Enviados (${env.length})</h2>${env.map(x => `<div class="item"><span class="chip" style="background:${STD[x.status][1]}">${STD[x.status][0]}</span><b>${esc(x.titulo)}</b><br><small>Para ${esc(x.destinatario || '—')} · enviado em ${x.enviado_em ? new Date(x.enviado_em + 'T12:00').toLocaleDateString('pt-BR') : '—'}</small>${x.notas ? `<div>${esc(x.notas)}</div>` : ''}<div>${abrir(x.arquivo, 'Cópia enviada')}${x.arquivo_resposta ? ' · ' + abrir(x.arquivo_resposta, 'Resposta recebida') : ''}</div>${x.resposta ? `<div><small><b>Resposta:</b> ${esc(x.resposta)}</small></div>` : ''}
+    <select onchange="statusDoc('${x.id}',this.value)" style="margin-top:6px">${Object.keys(STD).map(k => `<option value="${k}" ${k === x.status ? 'selected' : ''}>${STD[k][0]}</option>`).join('')}</select>
+    <button class="btn peq alt" onclick="respDoc('${x.id}')">Registrar resposta (texto)</button><label class="cp" style="font-size:.85rem">Anexar arquivo da resposta</label><input type="file" onchange="anexarResp('${x.id}',this)"></div>`).join('') || '<p class="vazio">Nenhum documento enviado registrado.</p>'}</div>`;
+}
+async function subir(file){
+  if (file.size > 20e6) throw new Error('Arquivo maior que 20 MB.');
+  const p = crypto.randomUUID() + '-' + file.name.replace(/[^\w.-]/g, '_');
+  const {error} = await sb.storage.from('documentos').upload(p, file);
+  if (error) throw error; return p;
+}
+async function novoDoc(e){
+  e.preventDefault();
+  try {
+    const f = e.target, file = f.arquivo.files[0];
+    const o = {tipo:f.tipo.value, titulo:f.titulo.value.trim(), destinatario:f.destinatario.value.trim() || null, notas:f.notas.value.trim() || null, enviado_em:f.enviado_em.value || null, mobilizacao_id:S.mob?.id || null, criado_por:S.user.email};
+    if (file) o.arquivo = await subir(file);
+    const {error} = await sb.from('documentos').insert(o); if (error) throw error;
+    toast('Documento salvo.'); render();
+  } catch (er) { toast('Não salvou: ' + er.message); }
+  return false;
+}
+async function abrirArq(p){
+  const w = window.open('', '_blank');
+  const {data, error} = await sb.storage.from('documentos').createSignedUrl(p, 300);
+  if (error){ w && w.close(); return toast(error.message); }
+  if (w) w.location = data.signedUrl; else location.href = data.signedUrl;
+}
+async function statusDoc(id, v){ const {error} = await sb.from('documentos').update({status:v}).eq('id', id); if (error) toast(error.message); render(); }
+async function respDoc(id){ const t = prompt('Resumo da resposta recebida:'); if (!t) return; const {error} = await sb.from('documentos').update({resposta:t, status:'respondido'}).eq('id', id); if (error) toast(error.message); render(); }
+async function anexarResp(id, inp){
+  const f = inp.files[0]; if (!f) return;
+  try { const p = await subir(f); const {error} = await sb.from('documentos').update({arquivo_resposta:p, status:'respondido'}).eq('id', id); if (error) throw error; toast('Resposta anexada.'); render(); }
+  catch (er) { toast('Não anexou: ' + er.message); }
+}
+
+// =====================================================================
+// NAVEGAÇÃO
+// =====================================================================
+const NAV = [['inicio','Início','house'],['cidades','Cidades','map-pin'],['ajudar','Ajudar','hand-heart'],['pet','Pet Solidário','paw-print'],['transparencia','Transparência','chart-column'],['comunidade','Comunidade','users']];
+function icones(){ try { lucide.createIcons(); } catch (e) {} }
+function menu(abrir){
+  $('#veu').classList.toggle('on', abrir); $('#gaveta').classList.toggle('on', abrir);
+  if (abrir) {
+    const L = [['#inicio','Início','house'],['#cidades','Cidades atingidas','map-pin'],['#ajudar/voluntario','Seja voluntário','users'],['#ajudar/doacoes','Doações e materiais','package'],['#ajudar/parcerias','Empresas e parcerias','hand-heart'],['#pet','Pet Solidário em Rede','paw-print'],['#ajudar/informe','Informar ocorrência','megaphone'],['#transparencia','Transparência','chart-column'],['#avisos','Avisos','bell'],['#comunidade','Comunidade','message-circle']];
+    $('#gaveta').innerHTML = `<img src="logo.png" alt="MAP Solidário">${L.map(x => `<a href="${x[0]}" onclick="menu(false)">${ico(x[2])} ${x[1]}</a>`).join('')}${team() ? `<div class="sep"></div><a href="#equipe" onclick="menu(false)">${ico('settings')} Área da equipe</a>` : ''}<div class="sep"></div><a href="#" onclick="menu(false);compartilhar();return false">${ico('share-2')} Compartilhar</a><a href="#privacidade" onclick="menu(false)">${ico('shield-check')} Privacidade</a>${S.user ? `<a href="#" onclick="menu(false);sair();return false">${ico('log-out')} Sair</a>` : ''}`;
+    icones();
+  }
+}
+async function render(){
+  clearInterval(chatTimer); limparMapas();
+  let [pag, arg] = location.hash.replace(/^#\/?/, '').split('/');
+  pag = pag || 'inicio';
+  const telas = {inicio, cidades, cidade, ajudar, pet, transparencia, avisos, privacidade, comunidade, equipe};
+  if (!telas[pag]) pag = 'inicio';
+  let html;
+  try { html = await telas[pag](arg); } catch (e) { console.error(e); html = `<div class="card"><h2>Algo deu errado</h2><p class="mut">${esc(e.message)}</p><button class="btn" onclick="location.reload()">Recarregar</button></div>`; }
+  $('#app').innerHTML = html;
+  const ativo = pag === 'cidade' ? 'cidades' : pag === 'equipe' ? 'comunidade' : pag;
+  $('#nav').innerHTML = NAV.map(([k, t, i]) => `<a class="${k === ativo ? 'on' : ''}" href="#${k}">${ico(i)}${t}</a>`).join('');
+  icones();
+  if (pag === 'inicio' && $('#mapaInicio')) criarMapa('mapaInicio');
+  if (pag === 'cidades') criarMapa('mapaCidades', {grande:true});
+  if (pag === 'cidade' && $('#mapaCidade')){ const c = S.cid.find(x => x.id === arg); const m = criarMapa('mapaCidade'); if (c) m.setView([c.lat, c.lng], 10); }
+  if (pag === 'equipe' && $('#mapaEquipe')){ const m = criarMapa('mapaEquipe', {grande:true}); m.on('click', ev => preencherCoord(ev.latlng.lat, ev.latlng.lng)); }
+  if (pag === 'comunidade' && S.grupo && $('#chat')){ carregarMsgs(true); chatTimer = setInterval(() => { if (!document.hidden) carregarMsgs(); }, 5000); }
+  const visto = ler('visto');
+  $('#ponto').hidden = !(S.avisos.length && (!visto || new Date(S.avisos[0].criado) > new Date(visto)));
+}
+let ultimaPag = '';
+window.addEventListener('hashchange', () => {
+  if (/access_token|error_description/.test(location.hash)) return;
+  const pag = location.hash.split('/')[0];
+  if (pag !== ultimaPag){ S.edit = null; scrollTo(0, 0); }
+  ultimaPag = pag; render();
+});
+
+(async () => {
+  icones();
+  if (!sb){ $('#app').innerHTML = '<div class="card"><h2>Falta configurar</h2><p>Preencha as linhas de CONFIGURAÇÃO no começo do script do arquivo index.html (URL e chave do Supabase).</p></div>'; return; }
+  const voltouDoLogin = /access_token|error_description|type=magiclink/.test(location.hash);
+  if (voltouDoLogin){
+    await sb.auth.getSession();
+    const erro = /error_description/.test(location.hash);
+    history.replaceState(null, '', location.pathname + '#comunidade');
+    if (erro) setTimeout(() => toast('O link de acesso venceu ou já foi usado. Peça um novo.'), 600);
+  }
+  sb.auth.onAuthStateChange((ev, sessao) => {
+    const novo = sessao?.user?.email || null;
+    if ((ev === 'SIGNED_IN' || ev === 'SIGNED_OUT') && novo !== (S.user?.email || null)) setTimeout(async () => { await carregarUsuario(); render(); }, 0);
+  });
+  await carregar();
+  ultimaPag = location.hash.split('/')[0];
+  render();
+})();
+</script>
+</body>
+</html>
